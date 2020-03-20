@@ -11,11 +11,15 @@ $rules = [
         //'list_range' => '.yxj_list',
         'detail_rules' => [
             'title' => ['h1', 'text'],
-            'author' => ['h2>span:eq(1)', 'text', function($content){
+            'author' => ['h2>span:eq(1)', 'text', '', function($content){
                 $p = mb_strpos($content, '：');
                 return mb_substr($content, $p+1);
             }],
-            'pub_date' => ['h2>span:eq(0)', 'text', function($content){
+            'origin' => ['h2>span:eq(2)', 'text', '', function($content){
+                $p = mb_strpos($content, '：');
+                return mb_substr($content, $p+1);
+            }],
+            'pub_date' => ['h2>span:eq(0)', 'text', '', function($content){
                 $p = mb_strpos($content, '：');
                 return mb_substr($content, $p+1);
             }],
@@ -25,30 +29,30 @@ $rules = [
                 foreach($ps as $p) {
                     pq($p)->removeAttr('*');
                 }
-                $imgs = pq($doc)->find('img');
-                if (isset($imgs) && count($imgs)>0) {
-                    $dir = 'images/'.join('/', explode('-', date("Y-md",time())));
-                    if (!is_dir($dir) && !mkdir($dir, 0777, true)){
-                        return $doc->htmlOuter();
-                    }
-                    foreach ($imgs as $img) {
-                        pq($img)->removeAttr('title');
-                        pq($img)->removeAttr('alt');
-                        pq($img)->removeAttr('width');
-                        pq($img)->removeAttr('height');
-                        pq($img)->removeAttr('oldsrc');
-                        $image_url = pq($img)->attr('src');
-                        $arr = explode('/', $image_url);
-                        $file_ext = explode('.', $arr[count($arr)-1])[1];
-                        $local_src = $dir.'/zt_'.md5($image_url).'.'.$file_ext;
-                        $stream = file_get_contents($image_url);
-                        file_put_contents($local_src, $stream);
-                        pq($img)->attr('src', $local_src);
-                    }
-                }
+//                $imgs = pq($doc)->find('img');
+//                if (isset($imgs) && count($imgs)>0) {
+//                    $dir = 'images/'.join('/', explode('-', date("Y-md",time())));
+//                    if (!is_dir($dir) && !mkdir($dir, 0777, true)){
+//                        return $doc->htmlOuter();
+//                    }
+//                    foreach ($imgs as $img) {
+//                        pq($img)->removeAttr('title');
+//                        pq($img)->removeAttr('alt');
+//                        pq($img)->removeAttr('width');
+//                        pq($img)->removeAttr('height');
+//                        pq($img)->removeAttr('oldsrc');
+//                        $image_url = pq($img)->attr('src');
+//                        $arr = explode('/', $image_url);
+//                        $file_ext = explode('.', $arr[count($arr)-1])[1];
+//                        $local_src = $dir.'/zt_'.md5($image_url).'.'.$file_ext;
+//                        $stream = file_get_contents($image_url);
+//                        file_put_contents($local_src, $stream);
+//                        pq($img)->attr('src', $local_src);
+//                    }
+//                }
                 return $doc->htmlOuter();
             }],
-            'images' => []
+            //'images' => [],
         ],
     ]
 ];

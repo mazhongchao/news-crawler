@@ -1,4 +1,5 @@
 test*
+config/db-*.php
 vendor/
 images/
 image/
