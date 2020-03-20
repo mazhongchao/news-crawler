@@ -1,0 +1,6 @@
+test*
+vendor/
+images/
+image/
+.vscode/
+.DS_Store
