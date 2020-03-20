@@ -27,7 +27,7 @@ $rules = [
                 }
                 $imgs = pq($doc)->find('img');
                 if (isset($imgs) && count($imgs)>0) {
-                    $dir = dirname(__FILE__).'/images/'.join('/', explode('-', date("Y-md",time())));
+                    $dir = 'images/'.join('/', explode('-', date("Y-md",time())));
                     if (!is_dir($dir) && !mkdir($dir, 0777, true)){
                         return $doc->htmlOuter();
                     }
@@ -53,4 +53,3 @@ $rules = [
     ]
 ];
 return $rules;
-?>
