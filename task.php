@@ -1,7 +1,7 @@
 <?php
 $task = [
     '3h' => [
-        'yjb.cn'=>'rules/yjb_cn_rules.php',
+        'edu.hebnews.cn' => 'rules/edu_hebnews_cn_rule.php',
     ],
     '6h' => [],
     '12h' => [],
