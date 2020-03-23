@@ -107,7 +107,7 @@ function work($rule, $detail_url = '', $dump_file = false)
 
     echo "\n  Start First List: ".$rule['list_url'];
     //列表第一页
-    $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->queryData();
+    $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->absoluteUrl($rule['list_url'])->queryData();
     //列表第一页的所有详情页
     foreach ($link_arr as $key => $value) {
         $detail_url = $value['detail_link'];
@@ -129,8 +129,11 @@ function work($rule, $detail_url = '', $dump_file = false)
     }
     //print_r($articles);
     //unset($link_arr);
-    dump_to_db($articles);
-    add_url_hash($redis, $articles);
+    if (!empty($articles)) {
+        dump_to_db($articles);
+        add_url_hash($redis, $articles);
+    }
+
     echo "\n  First List Done....";
 
     //如果只处理列表第一页
@@ -140,7 +143,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     }
 
     //接下来的列表页及详情页
-    if (iseet($rule['list_next_url']) && isset($rule['list_next_max']) && isset($rule['list_next_from'])) {
+    if (isset($rule['list_next_url']) && isset($rule['list_next_max']) && isset($rule['list_next_from'])) {
         $max_page = $rule['list_next_max'];
         $next_url = $rule['list_next_url'];
         $i = $rule['list_next_from']+0;
@@ -148,8 +151,8 @@ function work($rule, $detail_url = '', $dump_file = false)
             $articles = [];
             $next_list_url = sprintf($next_url, $i);
 
-            echo "\n   Start The Other Lists: ({$i})".$next_list_url;
-            $link_arr = QueryList::get($next_list_url)->rules($site['list_rules'])->queryData();
+            echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
+            $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->absoluteUrl($next_list_url)->queryData();
             foreach ($link_arr as $key => $value) {
                 $detail_url = $value['detail_link'];
                 echo "\n   >>>start the other detail ({$i} - {$key}): ".$detail_url;
@@ -159,10 +162,16 @@ function work($rule, $detail_url = '', $dump_file = false)
                     $rt[0]['source_url'] = $detail_url;
                     $rt[0]['source_url_md5'] = md5($detail_url);
                     $rt[0]['created_at'] = $created_at;
+                    $c = $rt[0]['content'];
+                    $c = trim(str_replace(PHP_EOL, '', $c));
+                    $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/", "", $c);
                     $articles[] = $rt[0];
                 }
             }
-            dump_to_db($articles);
+            if (!empty($articles)){
+                dump_to_db($articles);
+                add_url_hash($redis, $articles);
+            }
         }
         echo "\n  The Other Lists Done....";
     }
