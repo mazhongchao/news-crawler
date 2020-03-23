@@ -70,18 +70,19 @@ if (isset($task[$task_name])) {
 
 function work($rule, $detail_url = '', $dump_file = false)
 {
-    print_r($rule);
-    exit();
+    //print_r($rule);
+    //exit();
 
     $ql = QueryList::getInstance();
     $ql->use(AbsoluteUrl::class);
 
     $redis = new Redis();
     $redis->connect('127.0.0.1', 6379);
+    $redis->auth('admin');
     $redis->select(10);
 
     $start = time();
-    echo "strarting>>> ".$start."\n";
+    echo "Start at>>> ".$start."\n";
 
     //only for single detail page
     if ($detail_url != '') {
@@ -96,33 +97,41 @@ function work($rule, $detail_url = '', $dump_file = false)
                 add_url_hash($redis, $rt[0]);
             }
         }
+        echo "\nFinished>>> ".(time()-$start)." s\n\n";
         exit();
     }
 
     $articles = [];
     $created_at = time();
 
+    echo "\n  Start First List: ".$rule['list_url'];
     //列表第一页
     $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->queryData();
     //列表第一页的所有详情页
     foreach ($link_arr as $key => $value) {
-        $detail_link = $value['detail_link'];
+        $detail_url = $value['detail_link'];
+        echo "\n   >>>start detail page ({$key}): {$detail_url}";
         if (!is_collected($redis, $detail_url)) {
-            $rt = QueryList::get($detail_link)->rules($rule['detail_rules'])->absoluteUrl($detail_link)->queryData();
+            $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
             $rt[0]['site'] = $rule['site_name'];
-            $rt[0]['source_url'] = $detail_link;
-            $rt[0]['source_url_md5'] = md5($detail_link);
+            $rt[0]['source_url'] = $detail_url;
+            $rt[0]['source_url_md5'] = md5($detail_url);
             $rt[0]['created_at'] = $created_at;
+            $c = $rt[0]['content'];
+            $c = trim(str_replace(PHP_EOL, '', $c));
+            $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
             $articles[] = $rt[0];
         }
     }
     //print_r($articles);
-    unset($link_arr);
+    //unset($link_arr);
     dump_to_db($articles);
     add_url_hash($redis, $articles);
+    echo "\n  First List Done....";
 
-    //只处理列表第一页
+    //如果只处理列表第一页
     if ($rule['list_next_max']+0 <= 0) {
+        echo "\nFinished>>> ".(time()-$start)." s\n\n";
         exit();
     }
 
@@ -131,17 +140,20 @@ function work($rule, $detail_url = '', $dump_file = false)
     if iseet($rule['list_next_url'] && $rule['list_next_max']) {
         $max_page = $rule['list_next_max'];
         $next_url = $rule['list_next_url'];
-        for ($i=1; $i<=$max_page; i++) {
+        for ($i=$rule['list_next_from']; $i<=$max_page; i++) {
             $articles = [];
             $next_list_url = sprintf($next_url, $i);
+
+            echo "\n   Start The Other List: ({$i})".$next_list_url;
             $link_arr = QueryList::get($next_list_url)->rules($site['list_rules'])->queryData();
             foreach ($link_arr as $key => $value) {
-                $detail_link = $value['detail_link'];
+                $detail_url = $value['detail_link'];
+                echo "\n   >>>start the other detail ({$i} - {$key}): ".$detail_url;
                 if (!is_collected($redis, $detail_url)) {
-                    $rt = QueryList::get($detail_link)->rules($rule['detail_rules'])->absoluteUrl($detail_link)->queryData();
+                    $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
                     $rt[0]['site'] = $rule['site_name'];
-                    $rt[0]['source_url'] = $detail_link;
-                    $rt[0]['source_url_md5'] = md5($detail_link);
+                    $rt[0]['source_url'] = $detail_url;
+                    $rt[0]['source_url_md5'] = md5($detail_url);
                     $rt[0]['created_at'] = $created_at;
                     $articles[] = $rt[0];
                 }
@@ -149,9 +161,10 @@ function work($rule, $detail_url = '', $dump_file = false)
             }
             dump_to_db($articles);
         }
+        echo "\n  The Other List Done....";
     }
     */
-    echo "finished>>> ".(time()-$start)." ms";
+    echo "\nFinished>>> ".(time()-$start)." ms\n\n";
 }
 
 function is_collected($redis, $url)
