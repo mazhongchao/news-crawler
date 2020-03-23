@@ -13,7 +13,8 @@ $usage =<<<STR
     -f: optional, only first list page of the web site.
     -l: optional, specific list url of the web site.
     -s: optional, specific datail page of the web site.
-    -d: optional, dump the data into a file which is in 'dump' directory, it is valid only for option -s. The default method is to store the data into the database, you need to have a database configuration file in 'config' directory.
+    -d: optional, dump the data into a file which is in 'dump' directory, it is valid only for option -s.
+        The default method is to store the data into the database, you need to have a database configuration file in 'config' directory.
 
 
 STR;
@@ -82,7 +83,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     $redis->select(10);
 
     $start = time();
-    echo "Start at>>> ".$start."\n";
+    echo "Start at>>> ".$start;
 
     //only for single detail page
     if ($detail_url != '') {
@@ -122,6 +123,9 @@ function work($rule, $detail_url = '', $dump_file = false)
             $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
             $articles[] = $rt[0];
         }
+        else{
+            echo "\n      collected....";
+        }
     }
     //print_r($articles);
     //unset($link_arr);
@@ -136,15 +140,15 @@ function work($rule, $detail_url = '', $dump_file = false)
     }
 
     //接下来的列表页及详情页
-    /*
-    if iseet($rule['list_next_url'] && $rule['list_next_max']) {
+    if (iseet($rule['list_next_url']) && isset($rule['list_next_max']) && isset($rule['list_next_from'])) {
         $max_page = $rule['list_next_max'];
         $next_url = $rule['list_next_url'];
-        for ($i=$rule['list_next_from']; $i<=$max_page; i++) {
+        $i = $rule['list_next_from']+0;
+        for ($i; $i<=$max_page; $i++) {
             $articles = [];
             $next_list_url = sprintf($next_url, $i);
 
-            echo "\n   Start The Other List: ({$i})".$next_list_url;
+            echo "\n   Start The Other Lists: ({$i})".$next_list_url;
             $link_arr = QueryList::get($next_list_url)->rules($site['list_rules'])->queryData();
             foreach ($link_arr as $key => $value) {
                 $detail_url = $value['detail_link'];
@@ -157,13 +161,14 @@ function work($rule, $detail_url = '', $dump_file = false)
                     $rt[0]['created_at'] = $created_at;
                     $articles[] = $rt[0];
                 }
-                print_r($rt);
             }
             dump_to_db($articles);
         }
-        echo "\n  The Other List Done....";
+        echo "\n  The Other Lists Done....";
     }
-    */
+    else {
+        echo "\n  No More List Pages OR List Rule Error....";
+    }
     echo "\nFinished>>> ".(time()-$start)." ms\n\n";
 }
 

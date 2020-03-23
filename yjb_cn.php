@@ -49,14 +49,15 @@ if ($rule['list_next_max']+0 <= 0) {
     exit();
 }
 //接下来的列表页及详情页
-/*
-if iseet($rule['list_next_url'] && $rule['list_next_max']) {
+
+if (iseet($rule['list_next_url']) && isset($rule['list_next_max']) && isset($rule['list_next_from'])) {
     $max_page = $rule['list_next_max'];
     $next_url = $rule['list_next_url'];
-    for ($i=$rule['list_next_from']; $i<=$max_page; i++) {
+    $i = $rule['list_next_from']+0;
+    for (; $i<=$max_page; $i++) {
         $next_list_url = sprintf($next_url, $i);
 
-        echo "\n   Start The Other List ({$i}): {$next_list_url}";
+        echo "\n   Start The Other Lists ({$i}): {$next_list_url}";
         $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->queryData();
         foreach ($link_arr as $key => $value) {
             $detail_url = $value['detail_link'];
@@ -65,8 +66,11 @@ if iseet($rule['list_next_url'] && $rule['list_next_max']) {
             print_r($rt);
         }
     }
-    echo "\n  The Other List Done....";
+    echo "\n  The Other Lists Done....";
 }
-*/
+else {
+    echo "\n  No More List Pages OR List Rule Error....";
+}
+
 echo "\nFinished: ".(time()-$start)." s\n\n";
 
