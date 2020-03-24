@@ -1,11 +1,13 @@
 <?php
 $task = [
     '3h' => [
+        'hebnews.cn_hbyw' => 'rules/hebnews_hbyw.php',
         'hebnews.cn_edu' => 'rules/hebnews_edu.php',
         'hebnews.cn_zt' => 'rules/hebnews_zt.php',
-        'edu.people.com.cn_yc' => 'rules/people_edu_yc.php',
-        'edu.people.com.cn_zxx' => 'rules/people_edu_zxx.php',
-        'edu.people.com.cn_lx' => 'rules/people_edu_lx.php',
+        //'edu.people.com.cn_yc' => 'rules/people_edu_yc.php',
+        //'edu.people.com.cn_zxx' => 'rules/people_edu_zxx.php',
+        //'edu.people.com.cn_lx' => 'rules/people_edu_lx.php',
+        'eol.cn_yw' => 'rules/eol_yw.php',
         'eol.cn_zxx' => 'rules/eol_zxx.php',
         'eol.cn_xxdt' => 'rules/eol_xxdt.php',
         'edu.china.com.cn_gjjy' => 'rules/china_edu_gjjy.php',
