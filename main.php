@@ -107,7 +107,9 @@ function work($rule, $detail_url = '', $dump_file = false)
 
     echo "\n  Start First List: ".$rule['list_url'];
     //列表第一页
-    $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->absoluteUrl($rule['list_url'])->queryData();
+    //$link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->absoluteUrl($rule['list_url'])->queryData();
+    $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->queryData();
+    print_r($link_arr);exit();
     //列表第一页的所有详情页
     foreach ($link_arr as $key => $value) {
         $detail_url = $value['detail_link'];
@@ -152,7 +154,8 @@ function work($rule, $detail_url = '', $dump_file = false)
             $next_list_url = sprintf($next_url, $i);
 
             echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
-            $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->absoluteUrl($next_list_url)->queryData();
+            //$link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->absoluteUrl($next_list_url)->queryData();
+            $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->queryData();
             foreach ($link_arr as $key => $value) {
                 $detail_url = $value['detail_link'];
                 echo "\n   >>>start the other detail ({$i} - {$key}): ".$detail_url;
