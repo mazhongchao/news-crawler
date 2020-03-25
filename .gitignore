@@ -1,7 +1,7 @@
 test*
 config/db-*.php
+rules/
 vendor/
 images/
-image/
 .vscode/
 .DS_Store
