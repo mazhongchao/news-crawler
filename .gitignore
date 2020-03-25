@@ -1,6 +1,7 @@
 test*
 yjb_*
 config/db-*.php
+task.php
 rules/
 vendor/
 images/
