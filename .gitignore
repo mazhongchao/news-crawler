@@ -1,4 +1,5 @@
 test*
+yjb_*
 config/db-*.php
 rules/
 vendor/
