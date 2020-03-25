@@ -53,7 +53,6 @@ if ($rule['list_next_max']+0 <= 0) {
 }
 
 //接下来的列表页及详情页
-
 if (isset($rule['list_next_url']) && isset($rule['list_next_max']) && isset($rule['list_next_from'])) {
     $max_page = $rule['list_next_max'];
     $next_url = $rule['list_next_url'];

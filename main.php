@@ -106,14 +106,16 @@ function work($rule, $detail_url = '', $dump_file = false)
     $created_at = time();
 
     echo "\n  Start First List: ".$rule['list_url'];
+
     //列表第一页
     //$link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->absoluteUrl($rule['list_url'])->queryData();
     $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->queryData();
-    print_r($link_arr);exit();
+    //print_r($link_arr);exit();
+
     //列表第一页的所有详情页
     foreach ($link_arr as $key => $value) {
         $detail_url = $value['detail_link'];
-        echo "\n   >>>start detail page ({$key}): {$detail_url}";
+        echo "\n   >>> start detail page ({$key}): {$detail_url}";
         if (!is_collected($redis, $detail_url)) {
             $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
             $rt[0]['site'] = $rule['site_name'];
@@ -129,7 +131,7 @@ function work($rule, $detail_url = '', $dump_file = false)
             echo "\n      collected....";
         }
     }
-    //print_r($articles);
+
     //unset($link_arr);
     if (!empty($articles)) {
         dump_to_db($articles);
@@ -158,7 +160,7 @@ function work($rule, $detail_url = '', $dump_file = false)
             $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->queryData();
             foreach ($link_arr as $key => $value) {
                 $detail_url = $value['detail_link'];
-                echo "\n   >>>start the other detail ({$i} - {$key}): ".$detail_url;
+                echo "\n   >>> start the other detail ({$i} - {$key}): ".$detail_url;
                 if (!is_collected($redis, $detail_url)) {
                     $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
                     $rt[0]['site'] = $rule['site_name'];
