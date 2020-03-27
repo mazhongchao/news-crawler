@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 use QL\QueryList;
+use QL\Ext\CurlMulti;
 use QL\Ext\AbsoluteUrl;
 use Medoo\Medoo;
 
@@ -24,7 +25,10 @@ if (count($options) < 1) {
     echo $usage;
     exit();
 }
+//ugly global variable, KILL IT
+$imgurls = ['img_src'=>[], 'img_loc'=>[]];
 
+require "functions.php";
 $task = require "task.php";
 $task_name = $options['t'];
 
@@ -36,11 +40,11 @@ if (isset($task[$task_name])) {
             $rule = require $rule_file;
             $detail_url = '';
             $dump_file = false;
-            //only first page of list
+            //only first list page
             if (array_key_exists('f', $options)) {
                 $rule['list_next_max'] = 0;
             }
-            //only specific list
+            //only specific list page
             else if (isset($options['l'])) {
                 $rule['list_url'] = $options['l'];
                 $rule['list_next_max'] = 0;
@@ -68,12 +72,12 @@ if (isset($task[$task_name])) {
         }
     }
 }
+else {
+    echo "\nTASK IS NOT EXISTS.";
+}
 
 function work($rule, $detail_url = '', $dump_file = false)
 {
-    //print_r($rule);
-    //exit();
-
     $ql = QueryList::getInstance();
     $ql->use(AbsoluteUrl::class);
 
@@ -83,9 +87,8 @@ function work($rule, $detail_url = '', $dump_file = false)
     $redis->select(10);
 
     $start = time();
-    echo "Start at>>> ".$start;
+    echo "Start at>>> ".date("Y-m-d h:i:s", $start);
 
-    //only for single detail page
     if ($detail_url != '') {
         $rt = QueryList::get($detail_url)->rules($rule)->queryData();
         if ($dump_file) {
@@ -103,41 +106,27 @@ function work($rule, $detail_url = '', $dump_file = false)
     }
 
     $articles = [];
-    $created_at = time();
-
     echo "\n  Start First List: ".$rule['list_url'];
 
     //列表第一页
-    //$link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->absoluteUrl($rule['list_url'])->queryData();
     $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->queryData();
-    //print_r($link_arr);exit();
 
     //列表第一页的所有详情页
-    foreach ($link_arr as $key => $value) {
-        $detail_url = $value['detail_link'];
+    foreach ($link_arr as $key => $link) {
+        $detail_url = $link['detail_link'];
         echo "\n   >>> start detail page ({$key}): {$detail_url}";
         if (!is_collected($redis, $detail_url)) {
-            $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
-            $rt[0]['site'] = $rule['site_name'];
-            $rt[0]['source_url'] = $detail_url;
-            $rt[0]['source_url_md5'] = md5($detail_url);
-            $rt[0]['created_at'] = $created_at;
-            $c = $rt[0]['content'];
-            $c = trim(str_replace(PHP_EOL, '', $c));
-            $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
-            $articles[] = $rt[0];
+            $articles[] = parse_detail($detail_url, $link, $rule);
         }
         else{
             echo "\n      collected....";
         }
     }
-
-    //unset($link_arr);
     if (!empty($articles)) {
         dump_to_db($articles);
         add_url_hash($redis, $articles);
     }
-
+    download_imgages();
     echo "\n  First List Done....";
 
     //如果只处理列表第一页
@@ -146,7 +135,7 @@ function work($rule, $detail_url = '', $dump_file = false)
         exit();
     }
 
-    //接下来的列表页及详情页
+    //其他列表页及详情页
     if (isset($rule['list_next_url']) && isset($rule['list_next_max']) && isset($rule['list_next_from'])) {
         $max_page = $rule['list_next_max'];
         $next_url = $rule['list_next_url'];
@@ -156,27 +145,19 @@ function work($rule, $detail_url = '', $dump_file = false)
             $next_list_url = sprintf($next_url, $i);
 
             echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
-            //$link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->absoluteUrl($next_list_url)->queryData();
             $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->queryData();
-            foreach ($link_arr as $key => $value) {
-                $detail_url = $value['detail_link'];
+            foreach ($link_arr as $key => $link) {
+                $detail_url = $link['detail_link'];
                 echo "\n   >>> start the other detail ({$i} - {$key}): ".$detail_url;
                 if (!is_collected($redis, $detail_url)) {
-                    $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
-                    $rt[0]['site'] = $rule['site_name'];
-                    $rt[0]['source_url'] = $detail_url;
-                    $rt[0]['source_url_md5'] = md5($detail_url);
-                    $rt[0]['created_at'] = $created_at;
-                    $c = $rt[0]['content'];
-                    $c = trim(str_replace(PHP_EOL, '', $c));
-                    $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/", "", $c);
-                    $articles[] = $rt[0];
+                    $articles[] = parse_detail($detail_url, $link, $rule);
                 }
             }
             if (!empty($articles)){
                 dump_to_db($articles);
                 add_url_hash($redis, $articles);
             }
+            download_imgages();
         }
         echo "\n  The Other Lists Done....";
     }
@@ -186,26 +167,68 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "\nFinished>>> ".(time()-$start)." ms\n\n";
 }
 
-function is_collected($redis, $url)
+function parse_detail($detail_url, $link, $rule)
 {
-    if ($redis->hExists('url_hash', md5($url))) {
-        return true;
+    $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
+    $rt[0]['site'] = $rule['site_name'];
+    $rt[0]['source_url'] = $detail_url;
+    $rt[0]['source_url_md5'] = md5($detail_url);
+    $rt[0]['created_at'] = time();
+    $c = $rt[0]['content'];
+    $c = trim(str_replace(PHP_EOL, '', $c));
+    $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
+    if (isset($link['thumb'])){
+        $imgsrc = $link['thumb'];
+        $rt[0]['thumb'] = $link['thumb'];
     }
-    return false;
+    if (isset($link['author_profile'])) {
+        $rt[0]['author_profile'] = $link['author_profile'];
+    }
+    if (isset($link['cover_img'])){
+        $rt[0]['cover_img'] = $link['cover_img'];
+    }
+    if (isset($link['tags'])){
+        $rt[0]['tags'] = $link['tags'];
+    }
+    if (isset($link_arr['read_count'])){
+        $rt[0]['read_count'] = $link_arr['read_count'];
+    }
+    if (isset($link_arr['reprinted'])){
+        $rt[0]['reprinted'] = $link_arr['reprinted'];
+    }
+    return $rt[0];
 }
 
-function add_url_hash($redis, $articles)
+function download_imgages()
 {
-    foreach ($articles as $article) {
-        $redis->hset('url_hash', $article['source_url_md5'], $article['created_at']);
-    }
-}
+    global $imgurls;
+    $ql = QueryList::getInstance();
+    $ql->use(CurlMulti::class);
+    $ql->curlMulti($imgurls['img_src'])->success(function (QueryList $ql, CurlMulti $curl, $r) use($imgurls){
+        echo "Current url:{$r['info']['url']} \n";
 
-function dump_to_db($articles)
-{
-    $dbconfig = require "./config/db-config.php";
-    $db = new Medoo($dbconfig);
-    $db->insert("article", $articles);
-    //var_dump($db->error());
-    //echo $db->last_query();
+        $source_url = ($r['info']['url']);
+        $key = md5($source_url);
+        $arr = explode('/', $source_url);
+        $file = $arr[count($arr)-1];
+        $filename = $imgurls['img_loc'][$key];
+        $img = $r['body'];
+        $fp = @fopen($filename, 'a');
+        fwrite($fp, $img);
+        fclose($fp);
+    })->error(function ($errorInfo, CurlMulti $curl){
+        echo "Current url:{$errorInfo['info']['url']} \n";
+        print_r($errorInfo['error']);
+    })->start([
+        'maxThread' => 3,
+        'maxTry' => 3,
+        'opt' => [
+            CURLOPT_TIMEOUT => 90,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_RETURNTRANSFER => true
+        ],
+        /*
+        'cache' => ['enable' => false, 'compress' => false, 'dir' => null, 'expire' =>86400, 'verifyPost' => false]
+        */
+    ]);
 }
