@@ -71,8 +71,43 @@ function dump_to_db($articles)
     //echo $db->last_query();
 }
 
+function is_gb_html($html)
+{
+    $matches = [];
+    preg_match('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', $html, $matches);
+    if ($matches && isset($matches[3])) {
+        return strtoupper(substr($matches[3], 0, 2)) == 'GB';
+    }
+    return false;
+}
+
+function html_to_utf8($html)
+{
+    if (empty($html)) return $html;
+    if (is_gb_html($html)) {
+        $matches = [];
+        preg_match('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', $html, $matches);
+        $incode = strtoupper(substr($matches[3], 0));
+        $html = mb_convert_encoding($html;, "UTF-8", $incode);
+        $html = preg_replace('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', '<meta$1charset=$2utf-8', $html);
+    }
+    return $html;
+}
+
 //not used
-function push_mq($redis, $imgurls)
+function push_avmq($redis, $avurls)
+{
+    $urls = $imgurls['av_src'];
+    $locs = $imgurls['av_loc'];
+    foreach($urls as $url){
+        $redis->rpush('avdl_mq',$v);
+    }
+    foreach($locs as $key=>$local_src){
+        $redis->hset('av_path', $key, $local_src);
+    }
+}
+
+function push_imgmq($redis, $imgurls)
 {
     $urls = $imgurls['img_src'];
     $locs = $imgurls['img_loc'];
