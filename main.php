@@ -90,7 +90,12 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "Start at>>> ".date("Y-m-d h:i:s", $start);
 
     if ($detail_url != '') {
-        $rt = QueryList::get($detail_url)->rules($rule)->queryData();
+        $html = $ql->get($detail_url)->getHtml();
+        if (is_gb_html($html)) {
+            $html = html_gb2utf8($html);
+        }
+        $rt = $ql->rules($rule['detail_rules'])->queryData();
+
         if ($dump_file) {
             //write the data into file, not implement it yet.
         }
@@ -109,7 +114,14 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "\n  Start First List: ".$rule['list_url'];
 
     //列表第一页
-    $link_arr = QueryList::get($rule['list_url'])->rules($rule['list_rules'])->queryData();
+    $html = $ql->get($rule['list_url'])->getHtml();
+    if (is_gb_html($html)) {
+        $html = html_gb2utf8($html);
+        $ql->html($html);
+    }
+    $link_arr = $ql->rules($rule['list_rules'])->queryData();
+    // print_r($link_arr);
+    // exit();
 
     //列表第一页的所有详情页
     foreach ($link_arr as $key => $link) {
@@ -145,7 +157,12 @@ function work($rule, $detail_url = '', $dump_file = false)
             $next_list_url = sprintf($next_url, $i);
 
             echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
-            $link_arr = QueryList::get($next_list_url)->rules($rule['list_rules'])->queryData();
+            $html = $ql->get($next_list_url)->getHtml();
+            if (is_gb_html($html)) {
+                $html = html_gb2utf8($html);
+                $ql->html($html);
+            }
+            $link_arr = $ql->rules($rule['list_rules'])->queryData();
             foreach ($link_arr as $key => $link) {
                 $detail_url = $link['detail_link'];
                 echo "\n   >>> start the other detail ({$i} - {$key}): ".$detail_url;
@@ -169,14 +186,26 @@ function work($rule, $detail_url = '', $dump_file = false)
 
 function parse_detail($detail_url, $link, $rule)
 {
-    $rt = QueryList::get($detail_url)->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
+    $ql = QueryList::getInstance();
+    $html = $ql->get($detail_url)->getHtml();
+    if (is_gb_html($html)) {
+        $html = html_gb2utf8($html);
+        $ql->html($html);
+    }
+    $rt = $ql->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
     $rt[0]['site'] = $rule['site_name'];
     $rt[0]['source_url'] = $detail_url;
     $rt[0]['source_url_md5'] = md5($detail_url);
-    $rt[0]['created_at'] = time();
+    $t = time();
+    $rt[0]['created_at'] = $t;
+    $rt[0]['collect_time'] = date("Y-m-d h:i:s", $t);
     $c = $rt[0]['content'];
     $c = trim(str_replace(PHP_EOL, '', $c));
     $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
+    if (isset($link['summary'])){
+        $imgsrc = $link['summary'];
+        $rt[0]['summary'] = $link['summary'];
+    }
     if (isset($link['thumb'])){
         $imgsrc = $link['thumb'];
         $rt[0]['thumb'] = $link['thumb'];
@@ -190,12 +219,13 @@ function parse_detail($detail_url, $link, $rule)
     if (isset($link['tags'])){
         $rt[0]['tags'] = $link['tags'];
     }
-    if (isset($link_arr['read_count'])){
-        $rt[0]['read_count'] = $link_arr['read_count'];
+    if (isset($link['read_count'])){
+        $rt[0]['read_count'] = $link['read_count'];
     }
-    if (isset($link_arr['reprinted'])){
-        $rt[0]['reprinted'] = $link_arr['reprinted'];
+    if (isset($link['reprinted'])){
+        $rt[0]['reprinted'] = $link['reprinted'];
     }
+    //print_r($rt[0]);
     return $rt[0];
 }
 

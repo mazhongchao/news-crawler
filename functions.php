@@ -78,19 +78,18 @@ function is_gb_html($html)
     if ($matches && isset($matches[3])) {
         return strtoupper(substr($matches[3], 0, 2)) == 'GB';
     }
+    $encode = mb_detect_encoding($text, ['ASCII', 'EUC-CN', 'UTF-8']);
+    if ('EUC-CN' == $encode) {
+        return true;
+    }
     return false;
 }
 
-function html_to_utf8($html)
+function html_gb2utf8($html)
 {
     if (empty($html)) return $html;
-    if (is_gb_html($html)) {
-        $matches = [];
-        preg_match('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', $html, $matches);
-        $incode = strtoupper(substr($matches[3], 0));
-        $html = mb_convert_encoding($html;, "UTF-8", $incode);
-        $html = preg_replace('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', '<meta$1charset=$2utf-8', $html);
-    }
+    $html = mb_convert_encoding($html, "UTF-8", "GBK");
+    $html = preg_replace('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', '<meta$1charset=$2utf-8', $html);
     return $html;
 }
 
@@ -117,4 +116,17 @@ function push_imgmq($redis, $imgurls)
     foreach($locs as $key=>$local_src){
         $redis->hset('img_path', $key, $local_src);
     }
+}
+function parse_html_encode($html)
+{
+    $matches = [];
+    preg_match('/<meta([^>]*)charset\s*=\s*("|\')*\s*([\w-]+)/i', $html, $matches);
+    if ($matches && isset($matches[3])) {
+        return $matches[3];
+    }
+    mb_detect_encoding($text, ['ASCII', 'EUC-CN', 'UTF-8']);
+    if ('EUC-CN' == $encode) {
+            return 'GBK';
+    }
+    return false;
 }
