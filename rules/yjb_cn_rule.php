@@ -8,7 +8,6 @@ $rule = [
     'list_rules' => [
         'detail_link' => ['.yxj_list li>a', 'href']
     ],
-    //'list_range' => '.yxj_list',
     'detail_rules' => [
         'title' => ['h1', 'text'],
         'author' => ['h2>span:eq(1)', 'text', '', function($content){
@@ -31,17 +30,8 @@ $rule = [
             }
             $imgs = pq($doc)->find('img');
             if (isset($imgs) && count($imgs)>0) {
-                $dir = 'images/'.join('/', explode('-', date("Y-md",time())));
-                if (!is_dir($dir) && !mkdir($dir, 0777, true)){
-                    return $doc->htmlOuter();
-                }
                 foreach ($imgs as $img) {
-                    $image_url = pq($img)->attr('src');
-                    $arr = explode('/', $image_url);
-                    $file_ext = explode('.', $arr[count($arr)-1])[1];
-                    $local_src = $dir.'/zt_'.md5($image_url).'.'.$file_ext;
-                    $stream = file_get_contents($image_url);
-                    file_put_contents($local_src, $stream);
+                    $local_src = parse_imgurl(pq($img)->attr('src'));
                     pq($img)->removeAttr('*');
                     pq($img)->attr('src', $local_src);
                 }
