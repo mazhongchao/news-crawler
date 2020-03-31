@@ -28,6 +28,7 @@ if (count($options) < 1) {
 //ugly global variable, KILL IT
 $imgurls = ['img_src'=>[], 'img_loc'=>[]];
 
+date_default_timezone_set('PRC');
 require "functions.php";
 $task = require "task.php";
 $task_name = $options['t'];
@@ -87,7 +88,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     $redis->select(10);
 
     $start = time();
-    echo "Start at>>> ".date("Y-m-d h:i:s", $start);
+    echo "Start at>>> ".date("Y-m-d H:i:s", $start);
 
     if ($detail_url != '') {
         $html = $ql->get($detail_url)->getHtml();
@@ -127,11 +128,16 @@ function work($rule, $detail_url = '', $dump_file = false)
     foreach ($link_arr as $key => $link) {
         $detail_url = $link['detail_link'];
         echo "\n   >>> start detail page ({$key}): {$detail_url}";
-        if (!is_collected($redis, $detail_url)) {
-            $articles[] = parse_detail($detail_url, $link, $rule);
-        }
-        else{
-            echo "\n      collected....";
+        if ($detail_url!='') {
+            if (!is_collected($redis, $detail_url)) {
+                $article = parse_detail($detail_url, $link, $rule);
+                if ($article['content']!='') {
+                    $articles[] = $article;
+                }
+            }
+            else{
+                echo "\n      collected....";
+            }
         }
     }
     if (!empty($articles)) {
@@ -166,8 +172,13 @@ function work($rule, $detail_url = '', $dump_file = false)
             foreach ($link_arr as $key => $link) {
                 $detail_url = $link['detail_link'];
                 echo "\n   >>> start the other detail ({$i} - {$key}): ".$detail_url;
-                if (!is_collected($redis, $detail_url)) {
-                    $articles[] = parse_detail($detail_url, $link, $rule);
+                if ($detail_url!='') {
+                    if (!is_collected($redis, $detail_url)) {
+                        $article = parse_detail($detail_url, $link, $rule);
+                        if ($article['content']!='') {
+                            $articles[] = $article;
+                        }
+                    }
                 }
             }
             if (!empty($articles)){
@@ -181,7 +192,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     else {
         echo "\n  No More List Pages OR List Rule Error....";
     }
-    echo "\nFinished>>> ".(time()-$start)." ms\n\n";
+    echo "\nFinished>>> ".(time()-$start)." s\n\n";
 }
 
 function parse_detail($detail_url, $link, $rule)
@@ -198,10 +209,15 @@ function parse_detail($detail_url, $link, $rule)
     $rt[0]['source_url_md5'] = md5($detail_url);
     $t = time();
     $rt[0]['created_at'] = $t;
-    $rt[0]['collect_time'] = date("Y-m-d h:i:s", $t);
-    $c = $rt[0]['content'];
-    $c = trim(str_replace(PHP_EOL, '', $c));
-    $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
+    $rt[0]['collect_time'] = date("Y-m-d H:i:s", $t);
+    if (isset($rt[0]['content'])) {
+        $c = $rt[0]['content'];
+        $c = trim(str_replace(PHP_EOL, '', $c));
+        $rt[0]['content'] = preg_replace("/<!--[^\!\[]*?(?<!\/\/)-->/","",$c);
+    }
+    else {
+        $rt[0]['content'] = '';
+    }
     if (isset($link['summary'])){
         $imgsrc = $link['summary'];
         $rt[0]['summary'] = $link['summary'];
@@ -231,12 +247,13 @@ function parse_detail($detail_url, $link, $rule)
 
 function download_imgages()
 {
+    echo "\nDownload images....\n";
     global $imgurls;
     $ql = QueryList::getInstance();
     $ql->use(CurlMulti::class);
-    $ql->curlMulti($imgurls['img_src'])->success(function (QueryList $ql, CurlMulti $curl, $r) use($imgurls){
-        echo "Current url:{$r['info']['url']} \n";
-
+    if (!empty($imgurls['img_src'])) {
+        $ql->curlMulti($imgurls['img_src'])->success(function (QueryList $ql, CurlMulti $curl, $r) use($imgurls){
+        echo "image url:{$r['info']['url']} \n";
         $source_url = ($r['info']['url']);
         $key = md5($source_url);
         $arr = explode('/', $source_url);
@@ -246,19 +263,23 @@ function download_imgages()
         $fp = @fopen($filename, 'a');
         fwrite($fp, $img);
         fclose($fp);
-    })->error(function ($errorInfo, CurlMulti $curl){
-        echo "Current url:{$errorInfo['info']['url']} \n";
+        })->error(function ($errorInfo, CurlMulti $curl){
+        echo "image url:{$errorInfo['info']['url']} \n";
         print_r($errorInfo['error']);
-    })->start([
-        'maxThread' => 3,
-        'maxTry' => 3,
-        'opt' => [
-            CURLOPT_TIMEOUT => 90,
-            CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_RETURNTRANSFER => true
-        ],
-        /*
-        'cache' => ['enable' => false, 'compress' => false, 'dir' => null, 'expire' =>86400, 'verifyPost' => false]
-        */
-    ]);
+        })->start([
+            'maxThread' => 3,
+            'maxTry' => 3,
+            'opt' => [
+                CURLOPT_TIMEOUT => 90,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_RETURNTRANSFER => true
+            ],
+            /*
+            'cache' => ['enable' => false, 'compress' => false, 'dir' => null, 'expire' =>86400, 'verifyPost' => false]
+            */
+        ]);
+    }
+    else {
+        echo "No images needed to download....\n";
+    }
 }

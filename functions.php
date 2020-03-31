@@ -31,6 +31,7 @@ function stored_name($imgurl)
 
 function parse_imgurl($img_src, $host='')
 {
+    //$loc_dir = "images/2020/03/30";
     $loc_dir = stored_dir();
     $name_arr = stored_name($img_src);
     $loc_key = $name_arr[0];
@@ -68,7 +69,7 @@ function dump_to_db($articles)
     $db = new Medoo($dbconfig);
     $db->insert("article", $articles);
     //var_dump($db->error());
-    //echo $db->last_query();
+    //echo $db->last();
 }
 
 function is_gb_html($html)
@@ -126,7 +127,7 @@ function parse_html_encode($html)
     }
     mb_detect_encoding($text, ['ASCII', 'EUC-CN', 'UTF-8']);
     if ('EUC-CN' == $encode) {
-            return 'GBK';
+        return 'GBK';
     }
     return false;
 }
