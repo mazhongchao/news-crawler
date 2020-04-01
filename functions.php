@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require dirname(__FILE__).'/vendor/autoload.php';
 use Medoo\Medoo;
 
 function stored_dir($pre_path = 'images')
@@ -65,7 +65,7 @@ function add_url_hash($redis, $articles)
 
 function dump_to_db($articles)
 {
-    $dbconfig = require "./config/db-config.php";
+    $dbconfig = require dirname(__FILE__)."/config/db-config.php";
     $db = new Medoo($dbconfig);
     $db->insert("article", $articles);
     //var_dump($db->error());
@@ -94,17 +94,6 @@ function html_gb2utf8($html)
     return $html;
 }
 
-function req_headers()
-{
-    $user_agents = require_once 'agent.php';
-    $agents = $user_agents['userAgent'];
-    $r = rand(0, count($agents)-1);
-    $agent = $agents[$r];
-
-    return ['headers'=>[
-        'User-Agent' => $agent,
-    ]];
-}
 //not used
 function push_avmq($redis, $avurls)
 {

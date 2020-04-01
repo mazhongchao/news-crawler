@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require dirname(__FILE__).'/vendor/autoload.php';
 use QL\QueryList;
 use QL\Ext\CurlMulti;
 use QL\Ext\AbsoluteUrl;
@@ -29,14 +29,14 @@ if (count($options) < 1) {
 $imgurls = ['img_src'=>[], 'img_loc'=>[]];
 
 date_default_timezone_set('PRC');
-require "functions.php";
-$task = require "task.php";
+require dirname(__FILE__).'/functions.php';
+$task = require dirname(__FILE__).'/task.php';
 $task_name = $options['t'];
 
 if (isset($task[$task_name])) {
     $sites = $task[$task_name];
     if (isset($options['n']) && isset($sites[$options['n']])) {
-        $rule_file = $sites[$options['n']];
+        $rule_file = dirname(__FILE__).'/'.$sites[$options['n']];
         if (is_file($rule_file)) {
             $rule = require $rule_file;
             $detail_url = '';
@@ -60,9 +60,13 @@ if (isset($task[$task_name])) {
             }
             work($rule, $detail_url, $dump_file);
         }
+        else {
+            echo "The Rule File <$rule_file> is not exists....";
+        }
     }
     else {
-        foreach ($sites as $site => $rule_file) {
+        foreach ($sites as $site => $rulefile) {
+            $rule_file = dirname(__FILE__).'/'.$rulefile;
             if (is_file($rule_file)) {
                 $rule = require $rule_file;
                 if (array_key_exists('f', $options)) {
@@ -91,8 +95,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "Start at>>> ".date("Y-m-d H:i:s", $start);
 
     if ($detail_url != '') {
-        $headers = req_headers();
-        $html = $ql->get($detail_url, $headers)->getHtml();
+        $html = $ql->get($detail_url)->getHtml();
         if (is_gb_html($html)) {
             $html = html_gb2utf8($html);
         }
@@ -116,8 +119,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "\n  Start First List: ".$rule['list_url'];
 
     //列表第一页
-    $headers = req_headers();
-    $html = $ql->get($rule['list_url'], $headers)->getHtml();
+    $html = $ql->get($rule['list_url'])->getHtml();
     if (is_gb_html($html)) {
         $html = html_gb2utf8($html);
         $ql->html($html);
@@ -165,8 +167,7 @@ function work($rule, $detail_url = '', $dump_file = false)
             $next_list_url = sprintf($next_url, $i);
 
             echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
-            $headers = req_headers();
-            $html = $ql->get($next_list_url, $headers)->getHtml();
+            $html = $ql->get($next_list_url)->getHtml();
             if (is_gb_html($html)) {
                 $html = html_gb2utf8($html);
                 $ql->html($html);
@@ -209,8 +210,7 @@ function parse_detail($detail_url, $link, $rule)
         $html = html_gb2utf8($html);
         $ql->html($html);
     }
-    $headers = req_headers();
-    $rt = $ql->rules($rule['detail_rules'], $headers)->absoluteUrl($detail_url)->queryData();
+    $rt = $ql->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
     $rt[0]['site'] = $rule['site_name'];
     $rt[0]['source_url'] = $detail_url;
     $rt[0]['source_url_md5'] = md5($detail_url);
