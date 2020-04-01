@@ -79,7 +79,7 @@ function is_gb_html($html)
     if ($matches && isset($matches[3])) {
         return strtoupper(substr($matches[3], 0, 2)) == 'GB';
     }
-    $encode = mb_detect_encoding($text, ['ASCII', 'EUC-CN', 'UTF-8']);
+    $encode = mb_detect_encoding($html, ['ASCII', 'EUC-CN', 'UTF-8']);
     if ('EUC-CN' == $encode) {
         return true;
     }

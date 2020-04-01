@@ -179,6 +179,9 @@ function work($rule, $detail_url = '', $dump_file = false)
                             $articles[] = $article;
                         }
                     }
+                    else{
+                        echo "\n      collected....";
+                    }
                 }
             }
             if (!empty($articles)){
