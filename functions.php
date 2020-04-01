@@ -94,6 +94,17 @@ function html_gb2utf8($html)
     return $html;
 }
 
+function req_headers()
+{
+    $user_agents = require_once 'agent.php';
+    $agents = $user_agents['userAgent'];
+    $r = rand(0, count($agents)-1);
+    $agent = $agents[$r];
+
+    return ['headers'=>[
+        'User-Agent' => $agent,
+    ]];
+}
 //not used
 function push_avmq($redis, $avurls)
 {

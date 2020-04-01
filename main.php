@@ -91,7 +91,8 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "Start at>>> ".date("Y-m-d H:i:s", $start);
 
     if ($detail_url != '') {
-        $html = $ql->get($detail_url)->getHtml();
+        $headers = req_headers();
+        $html = $ql->get($detail_url, $headers)->getHtml();
         if (is_gb_html($html)) {
             $html = html_gb2utf8($html);
         }
@@ -115,7 +116,8 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "\n  Start First List: ".$rule['list_url'];
 
     //列表第一页
-    $html = $ql->get($rule['list_url'])->getHtml();
+    $headers = req_headers();
+    $html = $ql->get($rule['list_url'], $headers)->getHtml();
     if (is_gb_html($html)) {
         $html = html_gb2utf8($html);
         $ql->html($html);
@@ -163,7 +165,8 @@ function work($rule, $detail_url = '', $dump_file = false)
             $next_list_url = sprintf($next_url, $i);
 
             echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
-            $html = $ql->get($next_list_url)->getHtml();
+            $headers = req_headers();
+            $html = $ql->get($next_list_url, $headers)->getHtml();
             if (is_gb_html($html)) {
                 $html = html_gb2utf8($html);
                 $ql->html($html);
@@ -206,7 +209,8 @@ function parse_detail($detail_url, $link, $rule)
         $html = html_gb2utf8($html);
         $ql->html($html);
     }
-    $rt = $ql->rules($rule['detail_rules'])->absoluteUrl($detail_url)->queryData();
+    $headers = req_headers();
+    $rt = $ql->rules($rule['detail_rules'], $headers)->absoluteUrl($detail_url)->queryData();
     $rt[0]['site'] = $rule['site_name'];
     $rt[0]['source_url'] = $detail_url;
     $rt[0]['source_url_md5'] = md5($detail_url);
