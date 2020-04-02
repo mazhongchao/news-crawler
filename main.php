@@ -52,7 +52,7 @@ if (isset($task[$task_name])) {
             }
             //only specific detail page
             else if (isset($options['s'])) {
-                $rule = $rule['detail_rules'];
+                //$rule = $rule['detail_rules']; ---bug
                 $detail_url = $options['s'];
                 if (isset($options['d'])) {
                     $dump_file = true;
@@ -61,7 +61,7 @@ if (isset($task[$task_name])) {
             work($rule, $detail_url, $dump_file);
         }
         else {
-            echo "The Rule File <$rule_file> is not exists....";
+            echo "\nThe Rule File <$rule_file> IS NOT EXISTS....\n";
         }
     }
     else {
@@ -78,7 +78,7 @@ if (isset($task[$task_name])) {
     }
 }
 else {
-    echo "\nTASK IS NOT EXISTS.";
+    echo "\nTASK IS NOT EXISTS....\n";
 }
 
 function work($rule, $detail_url = '', $dump_file = false)
@@ -92,7 +92,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     $redis->select(10);
 
     $start = time();
-    echo "Start at>>> ".date("Y-m-d H:i:s", $start);
+    echo "Start at>>> ".date("Y-m-d H:i:s", $start)."\n";
 
     if ($detail_url != '') {
         $html = $ql->get($detail_url)->getHtml();
@@ -111,12 +111,12 @@ function work($rule, $detail_url = '', $dump_file = false)
                 add_url_hash($redis, $rt[0]);
             }
         }
-        echo "\nFinished>>> ".(time()-$start)." s\n\n";
+        echo "Finished>>> ".(time()-$start)." s\n\n";
         exit();
     }
 
     $articles = [];
-    echo "\n  Start First List: ".$rule['list_url'];
+    echo "  Start First List: ".$rule['list_url']."\n";
 
     //列表第一页
     $html = $ql->get($rule['list_url'])->getHtml();
@@ -131,7 +131,7 @@ function work($rule, $detail_url = '', $dump_file = false)
     //列表第一页的所有详情页
     foreach ($link_arr as $key => $link) {
         $detail_url = $link['detail_link'];
-        echo "\n   >>> start detail page ({$key}): {$detail_url}";
+        echo "   >>> start detail page ({$key}): {$detail_url}\n";
         if ($detail_url!='') {
             if (!is_collected($redis, $detail_url)) {
                 $article = parse_detail($detail_url, $link, $rule);
@@ -140,20 +140,20 @@ function work($rule, $detail_url = '', $dump_file = false)
                 }
             }
             else{
-                echo "\n      collected....";
+                echo "      collected....\n";
             }
         }
     }
     if (!empty($articles)) {
         dump_to_db($articles);
         add_url_hash($redis, $articles);
+        download_imgages();
     }
-    download_imgages();
-    echo "\n  First List Done....";
+    echo "  First List Done....\n";
 
     //如果只处理列表第一页
     if ($rule['list_next_max']+0 <= 0) {
-        echo "\nFinished>>> ".(time()-$start)." s\n\n";
+        echo "Finished>>> ".(time()-$start)." s\n\n";
         exit();
     }
 
@@ -166,7 +166,7 @@ function work($rule, $detail_url = '', $dump_file = false)
             $articles = [];
             $next_list_url = sprintf($next_url, $i);
 
-            echo "\n   Start The Other Lists ({$i}): ".$next_list_url;
+            echo "   Start The Other Lists ({$i}): {$next_list_url}\n";
             $html = $ql->get($next_list_url)->getHtml();
             if (is_gb_html($html)) {
                 $html = html_gb2utf8($html);
@@ -175,7 +175,7 @@ function work($rule, $detail_url = '', $dump_file = false)
             $link_arr = $ql->rules($rule['list_rules'])->queryData();
             foreach ($link_arr as $key => $link) {
                 $detail_url = $link['detail_link'];
-                echo "\n   >>> start the other detail ({$i} - {$key}): ".$detail_url;
+                echo "   >>> start detail ({$i} - {$key}): $detail_url\n";
                 if ($detail_url!='') {
                     if (!is_collected($redis, $detail_url)) {
                         $article = parse_detail($detail_url, $link, $rule);
@@ -184,22 +184,22 @@ function work($rule, $detail_url = '', $dump_file = false)
                         }
                     }
                     else{
-                        echo "\n      collected....";
+                        echo "      collected....\n";
                     }
                 }
             }
             if (!empty($articles)){
                 dump_to_db($articles);
                 add_url_hash($redis, $articles);
+                download_imgages();
             }
-            download_imgages();
         }
-        echo "\n  The Other Lists Done....";
+        echo "  The Other Lists Done....\n";
     }
     else {
-        echo "\n  No More List Pages OR List Rule Error....";
+        echo "  No More List Pages OR List Rule Error....\n";
     }
-    echo "\nFinished>>> ".(time()-$start)." s\n\n";
+    echo "Finished>>> ".(time()-$start)." s\n\n";
 }
 
 function parse_detail($detail_url, $link, $rule)
@@ -229,9 +229,9 @@ function parse_detail($detail_url, $link, $rule)
         $imgsrc = $link['summary'];
         $rt[0]['summary'] = $link['summary'];
     }
-    if (isset($link['thumb'])){
-        $imgsrc = $link['thumb'];
-        $rt[0]['thumb'] = $link['thumb'];
+    if (isset($link['thumbnail'])){
+        $imgsrc = $link['thumbnail'];
+        $rt[0]['thumbnail'] = $link['thumbnail'];
     }
     if (isset($link['author_profile'])) {
         $rt[0]['author_profile'] = $link['author_profile'];
@@ -254,12 +254,13 @@ function parse_detail($detail_url, $link, $rule)
 
 function download_imgages()
 {
-    echo "\nDownload images....\n";
+    echo "Download images....\n";
     global $imgurls;
+    //print_r($imgurls);
     $ql = QueryList::getInstance();
     $ql->use(CurlMulti::class);
     if (!empty($imgurls['img_src'])) {
-        $ql->curlMulti($imgurls['img_src'])->success(function (QueryList $ql, CurlMulti $curl, $r) use($imgurls){
+        $ql->curlMulti($imgurls['img_src'])->success(function (QueryList $ql, CurlMulti $curl, $r) use(&$imgurls){
         echo "image url:{$r['info']['url']} \n";
         $source_url = ($r['info']['url']);
         $key = md5($source_url);
@@ -267,9 +268,13 @@ function download_imgages()
         $file = $arr[count($arr)-1];
         $filename = $imgurls['img_loc'][$key];
         $img = $r['body'];
-        $fp = @fopen($filename, 'a');
+        $fp = @fopen($filename, 'w');
         fwrite($fp, $img);
         fclose($fp);
+        array_diff($imgurls['img_src'], [$source_url]);
+        unset($imgurls['img_src'][array_search($source_url, $imgurls['img_src'])]);
+        unset($imgurls['img_loc'][$key]);
+        //print_r($imgurls);
         })->error(function ($errorInfo, CurlMulti $curl){
         echo "image url:{$errorInfo['info']['url']} \n";
         print_r($errorInfo['error']);
@@ -289,4 +294,6 @@ function download_imgages()
     else {
         echo "No images needed to download....\n";
     }
+    //$imgurls = ['img_src'=>[], 'img_loc'=>[]];
+    //print_r($imgurls);
 }

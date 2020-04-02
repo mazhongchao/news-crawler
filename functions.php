@@ -37,7 +37,6 @@ function stored_name($imgurl)
     else {
         return [$file_name, $file_name];
     }
-
 }
 
 function parse_imgurl($img_src, $host='')
@@ -47,6 +46,7 @@ function parse_imgurl($img_src, $host='')
     $name_arr = stored_name($img_src);
     $loc_key = $name_arr[0];
     $loc_name = $name_arr[1];
+
     global $imgurls;
     $imgurls['img_src'][] = $img_src;
     $imgurls['img_loc'][$loc_key] = join('/', [$loc_dir, $loc_name]);
