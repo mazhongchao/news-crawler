@@ -15,7 +15,12 @@ function stored_dir($pre_path = 'images')
 function stored_name($imgurl)
 {
     $arr = explode('/', $imgurl);
-    $file_ext = explode('.', $arr[count($arr)-1])[1];
+    $full_name = $arr[count($arr)-1];
+    $file_ext = '';
+    if (strpos($full_name, '.')!==false) {
+        $name_arr = explode('.', $full_name);
+        $file_ext = $name_arr[count($name_arr)-1];
+    }
     if (strlen($file_ext)>3) {
         $s = substr($file_ext, 0, 4);
         if ($s == 'jpeg'){
@@ -26,7 +31,13 @@ function stored_name($imgurl)
         }
     }
     $file_name = md5($imgurl);
-    return [$file_name, join('.', [$file_name, $file_ext])];
+    if ($file_ext!='') {
+        return [$file_name, join('.', [$file_name, $file_ext])];
+    }
+    else {
+        return [$file_name, $file_name];
+    }
+
 }
 
 function parse_imgurl($img_src, $host='')
