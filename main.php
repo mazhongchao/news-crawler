@@ -256,7 +256,6 @@ function download_imgages()
 {
     echo "Download images....\n";
     global $imgurls;
-    //print_r($imgurls);
     $ql = QueryList::getInstance();
     $ql->use(CurlMulti::class);
     if (!empty($imgurls['img_src'])) {
@@ -271,10 +270,9 @@ function download_imgages()
         $fp = @fopen($filename, 'w');
         fwrite($fp, $img);
         fclose($fp);
-        array_diff($imgurls['img_src'], [$source_url]);
-        unset($imgurls['img_src'][array_search($source_url, $imgurls['img_src'])]);
+        $idx = array_search($source_url, $imgurls['img_src']);
+        unset($imgurls['img_src'][$idx]);
         unset($imgurls['img_loc'][$key]);
-        //print_r($imgurls);
         })->error(function ($errorInfo, CurlMulti $curl){
         echo "image url:{$errorInfo['info']['url']} \n";
         print_r($errorInfo['error']);
