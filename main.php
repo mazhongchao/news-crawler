@@ -95,20 +95,28 @@ function work($rule, $detail_url = '', $dump_file = false)
     echo "Start at>>> ".date("Y-m-d H:i:s", $start)."\n";
 
     if ($detail_url != '') {
-        $html = $ql->get($detail_url)->getHtml();
-        if (is_gb_html($html)) {
-            $html = html_gb2utf8($html);
-        }
-        $rt = $ql->rules($rule['detail_rules'])->queryData();
-
-        if ($dump_file) {
-            //write the data into file, not implement it yet.
+        $article=[];
+        if (!is_collected($redis, $detail_url)) {
+            $article = parse_detail($detail_url, [], $rule);
         }
         else {
-            if (!is_collected($redis, $detail_url)) {
+            echo "Page <$detail_url> was collected....\n";
+        }
+        if ($dump_file) {
+            //write the data into file, not implement it yet.
+            echo ":)\n";
+        }
+        else {
+            if (!empty($article) && isset($article['content'])) {
+                $articles[] = $article;
+                $dbconfig = require dirname(__FILE__)."/config/db-config.php";
                 $db = new Medoo($dbconfig);
-                $db->insert("article", $rt[0]);
-                add_url_hash($redis, $rt[0]);
+                $db->insert("article", $articles);
+                add_url_hash($redis, $articles);
+                download_imgages();
+            }
+            else {
+                echo "Page content is empty....\n";
             }
         }
         echo "Finished>>> ".(time()-$start)." s\n\n";
