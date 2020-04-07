@@ -2,9 +2,13 @@
 require dirname(__FILE__).'/vendor/autoload.php';
 use Medoo\Medoo;
 
-function stored_dir($pre_path = 'images')
+function stored_dir($pre_path = '')
 {
+    if (empty($pre_path)) {
+        $pre_path = dirname(__FILE__).'/images';
+    }
     $pre_path = rtrim($pre_path, '/');
+    //$pre_path = '/data/projects/yjximg';
     $dir = $pre_path.'/'.join('/', explode('-', date("Y-m-d", time())));
     if (!is_dir($dir)) {
         @mkdir($dir, 0777, true);
