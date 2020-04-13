@@ -1,8 +1,11 @@
 {
     "require": {
-        "jaeger/querylist": "^4.0",
+        "jaeger/querylist": "^4.1.0",
         "jaeger/querylist-curl-multi": "^4.0",
         "jaeger/querylist-absolute-url": "^4.0",
         "catfan/medoo": "^1.7"
+    },
+    "autoload": {
+        "classmap": ["lib/"]
     }
 }

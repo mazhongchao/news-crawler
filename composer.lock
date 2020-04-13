@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "63ebc089543b90ff7980a370c86beacf",
+    "content-hash": "f7602cca97d5ca12e23a0b3c1977f5e0",
     "packages": [
         {
             "name": "ares333/php-curl",
@@ -371,16 +371,16 @@
         },
         {
             "name": "jaeger/querylist",
-            "version": "V4.0.4",
+            "version": "V4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jae-jae/QueryList.git",
-                "reference": "1c2e3f4adfba912c69dec33d16bc5797d7efbe27"
+                "reference": "df9e3bbf1943b77ac7ab91bd3fc59643fe458044"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jae-jae/QueryList/zipball/1c2e3f4adfba912c69dec33d16bc5797d7efbe27",
-                "reference": "1c2e3f4adfba912c69dec33d16bc5797d7efbe27",
+                "url": "https://api.github.com/repos/jae-jae/QueryList/zipball/df9e3bbf1943b77ac7ab91bd3fc59643fe458044",
+                "reference": "df9e3bbf1943b77ac7ab91bd3fc59643fe458044",
                 "shasum": ""
             },
             "require": {
@@ -390,6 +390,7 @@
                 "tightenco/collect": "^5"
             },
             "require-dev": {
+                "phpunit/phpunit": "^7.5",
                 "symfony/var-dumper": "^3.3"
             },
             "type": "library",
@@ -415,7 +416,7 @@
                 "phpQuery",
                 "spider"
             ],
-            "time": "2018-10-15T10:52:12+00:00"
+            "time": "2018-12-12T07:29:31+00:00"
         },
         {
             "name": "jaeger/querylist-absolute-url",
