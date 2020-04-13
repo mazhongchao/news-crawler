@@ -20,7 +20,10 @@ and run:
 composer dump-autoload
 ```
 
+To create  `rules` directory, adding a rule file. To create  `config` directory, and adding `task.php` & `config.php`. Some demos are below.
+
 ## rules/rule.php demo
+
 ```php
 $rule = [
     'site_name' => '中国教育新闻网',
