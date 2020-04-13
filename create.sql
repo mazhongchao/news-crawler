@@ -28,3 +28,20 @@ CREATE TABLE `article` (
   KEY `KEY5` (`created_at`),
   KEY `KEY6` (`synced_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `yjx`.`media` (
+  `id` INT(11) unsigned NOT NULL AUTO_INCREMENT,
+  `media_type` CHAR(10) NOT NULL DEFAULT '' COMMENT '资源类型：image, audio, video, doc',
+  `media_src` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '资源url',
+  `media_key` CHAR(128) NOT NULL DEFAULT '' COMMENT '资源url md5',
+  `media_loc` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '资源本地存储位置',
+  `collect_time` DATETIME NOT NULL DEFAULT '1000-01-01 00:00:00' COMMENT '采集时间',
+  `collect_ret` INT(2) NOT NULL DEFAULT 0 COMMENT '采集结果, -1采集失败，0暂未采集，1成功采集',
+  `collect_msg` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '采集信息, SUCCESS|失败信息|空',
+  `created_at` INT(11) unsigned NOT NULL DEFAULT 0 COMMENT '记录创建时间',
+  PRIMARY KEY (`id`),
+  INDEX `KEY1` (`media_type` ASC),
+  INDEX `KEY2` (`media_src` ASC),
+  INDEX `KEY3` (`media_key` ASC),
+  INDEX `KEY4` (`collect_time` ASC),
+  INDEX `KEY5` (`created_at` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
