@@ -2,16 +2,16 @@
 require dirname(__FILE__).'/vendor/autoload.php';
 
 $usage =<<<STR
-    php main.php -t=task [-n=site_name [-f [-l=list_url [-s=single_page [-d]]]]]
+    php main.php -t=task [-n=site_name [-f [-l=list_url [-s=single_page_url [-d]]]]]
     OR:
     php main.php -tTASK [-nSITE_NAME [-f [-lLIST_URL [-sSINGLE_PAGE [-d]]]]]
     -t: required, task name.
-    -n: optional, name of web site in task setting file.
-    -f: optional, only first list page of the web site.
-    -l: optional, specific list url of the web site.
-    -s: optional, specific datail page of the web site.
-    -d: optional, dump the data into a file which is in 'dump' directory, it is valid only for option -s.
-        The default method is to store the data into the database, you need to have a database configuration file in 'config' directory.
+    -n: optional, name of web site, defined in task setting file(config/task.php).
+    -f: optional, collect only first list page.
+    -l: optional, collect a specific list page.
+    -s: optional, collect a specific single page.
+    -d: optional, dump the data into a file which is in 'pagetext' directory, this option is valid only for option -s.
+        By default, to store the data into the database, you need to have a database configuration items in 'config' directory.
 
 
 STR;
