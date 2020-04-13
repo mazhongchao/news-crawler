@@ -22,11 +22,13 @@ composer dump-autoload
 
 To create  `rules` directory, adding a rule file. To create  `config` directory, and adding `task.php` & `config.php`. Some demos are below.
 
-## rules/rule.php demo
+## rules/yjb_rule.php demo
+
+`rules/rule.php` is used to define collection(crawler) rule.
 
 ```php
 $rule = [
-    'site_name' => '中国教育新闻网',
+    'site_name' => 'YJB.CN',
     'list_url' => 'http://www.jyb.cn/rmtlistxqjy/',
     'list_next_url' => 'http://www.jyb.cn/rmtlistxqjy/index_%u.html',
     'list_next_from' => 1,
@@ -66,10 +68,12 @@ $rule = [
         }],
     ],
 ];
+
 return $rule;
 ```
 
 ## config/config.php demo
+`config/config.php` is used to configure the items required by the collection(crawler) program.
 ```php
 $config = [
     'redis' => ['host' => '127.0.0.1', 'port' => 6379],
@@ -96,10 +100,19 @@ return $config;
 ```php
 $task = [
     '<TASK_NAME>' => [
-        '<SITE_A>' => 'rules/<SITE_A_RULE>.php',
-        '<SITE_B>' => 'rules/<SITE_B_RULE>.php'
+        'YJB' => 'rules/yjb_rule.php',
+        '<SITE_A>' => 'rules/<SITE_A_RULE>.php'
     ]
 ];
+
 return $task;
 ```
+`<TASK_NAME>`, `<SITE_A>` and `<SITE_A_RULE>` need to be replaced with your actual value.
 
+## Some usage
+```bash
+php main.php -t=3h
+php main.php -t=3h -n=YJB
+php main.php -t=3h -n=YJB -f
+php main.php -t=3h -n=YJB -s=http://www.jyb.cn/rmtzcg/xwy/wzxw/202003/t20200317_307896.html
+```
