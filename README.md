@@ -20,11 +20,11 @@ and run:
 composer dump-autoload
 ```
 
-To create  `rules` directory, adding a rule file. To create  `config` directory, and adding `task.php` & `config.php`. Some demos are below.
+Then, to create  `rules` directory, adding rule files, to create  `config` directory, and adding `task.php` & `config.php`. Some demos are below.
 
 ## rules/yjb_rule.php demo
 
-`rules/rule.php` is used to define collection(crawler) rule.
+e.g., `rules/yjb_rule.php` is used to define collection(crawler) rule.
 
 ```php
 $rule = [
@@ -96,18 +96,22 @@ return $config;
 ```
 
 ## config/task.php demo
-
+`config/task.php` is used to define collection tasks, so that the crawler program can find the collection rule files accroding to the configuration.
 ```php
 $task = [
-    '<TASK_NAME>' => [
+    '<TASK_NAME_1>' => [
         'YJB' => 'rules/yjb_rule.php',
         '<SITE_A>' => 'rules/<SITE_A_RULE>.php'
+    ],
+    '<TASK_NAME_2>' => [
+        '<SITE_B>' => 'rules/<SITE_B_RULE>.php',
+        '<SITE_C>' => 'rules/<SITE_C_RULE>.php'
     ]
 ];
 
 return $task;
 ```
-`<TASK_NAME>`, `<SITE_A>` and `<SITE_A_RULE>` need to be replaced with your actual value.
+`<TASK_NAME_1>`, `<SITE_A>` and `<SITE_A_RULE>` and so on, need to be replaced with your actual value.
 
 ## Some usage
 ```bash
