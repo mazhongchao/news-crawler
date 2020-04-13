@@ -21,7 +21,7 @@ composer dump-autoload
 ```
 
 ## rules/rule.php demo
-```
+```php
 $rule = [
     'site_name' => '中国教育新闻网',
     'list_url' => 'http://www.jyb.cn/rmtlistxqjy/',
@@ -67,7 +67,7 @@ return $rule;
 ```
 
 ## config/config.php demo
-```
+```php
 $config = [
     'redis' => ['host' => '127.0.0.1', 'port' => 6379],
     'mysql' => [
