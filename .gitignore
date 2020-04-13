@@ -1,9 +1,9 @@
-task.php
 test*
-yjb_*
-config/db-*.php
+api/
+config/
 logs/
 rules/
+scripts/
 vendor/
 images/
 .vscode/
