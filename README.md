@@ -22,9 +22,9 @@ composer dump-autoload
 
 Then, to create  `rules` directory, adding rule files, to create  `config` directory, and adding `task.php` & `config.php`. Some demos are below.
 
-## rules/yjb_rule.php demo
+## rules/yjb_cn.php demo
 
-e.g., `rules/yjb_rule.php` is used to define collection(crawler) rule.
+e.g., `rules/yjb_cn.php` is used to define collection(crawler) rule.
 
 ```php
 $rule = [
