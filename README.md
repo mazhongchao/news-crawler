@@ -111,7 +111,7 @@ $task = [
 
 return $task;
 ```
-`<TASK_NAME_1>`, `<SITE_A>` and so on, need to be replaced with your actual value.
+`<TASK_NAME_1>`, `<SITE_A>` and so on, of the above, need to be replaced with your actual value.
 
 ## Some usage
 ```bash
