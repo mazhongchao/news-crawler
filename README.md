@@ -10,7 +10,7 @@
 
 ## Add the Collector
 Editing composer.json:
-```
+```javascript
 "autoload": {
     "classmap": ["lib/"]
 }
@@ -112,6 +112,9 @@ $task = [
 return $task;
 ```
 `<TASK_NAME_1>`, `<SITE_A>` and so on, of the above, need to be replaced with your actual value.
+
+## Create a database
+To Refer to `create.sql` file to create a database and tables.
 
 ## Some usage
 ```bash
