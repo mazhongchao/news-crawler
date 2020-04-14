@@ -100,23 +100,23 @@ return $config;
 ```php
 $task = [
     '<TASK_NAME_1>' => [
-        'YJB' => 'rules/yjb_rule.php',
-        '<SITE_A>' => 'rules/<SITE_A_RULE>.php'
+        'yjb_cn',  //to find collectiong rule in this file: rules/yjb_cn.php
+        '<SITE_A>'
     ],
     '<TASK_NAME_2>' => [
-        '<SITE_B>' => 'rules/<SITE_B_RULE>.php',
-        '<SITE_C>' => 'rules/<SITE_C_RULE>.php'
+        '<SITE_B>',
+        '<SITE_C>'
     ]
 ];
 
 return $task;
 ```
-`<TASK_NAME_1>`, `<SITE_A>` and `<SITE_A_RULE>` and so on, need to be replaced with your actual value.
+`<TASK_NAME_1>`, `<SITE_A>` and so on, need to be replaced with your actual value.
 
 ## Some usage
 ```bash
 php main.php -t=3h
-php main.php -t=3h -n=YJB
-php main.php -t=3h -n=YJB -f
-php main.php -t=3h -n=YJB -s=http://www.jyb.cn/rmtzcg/xwy/wzxw/202003/t20200317_307896.html
+php main.php -t=3h -n=yjb_cn
+php main.php -t=3h -n=yjb_cn -f
+php main.php -t=3h -n=yjb_cn -s=http://www.jyb.cn/rmtzcg/xwy/wzxw/202003/t20200317_307896.html
 ```
