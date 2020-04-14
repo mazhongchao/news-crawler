@@ -72,7 +72,6 @@ class Collector
     }
     public static function work($rule, $article_url='', $dump_file=false)
     {
-        $ql = self::ql();
         $redis = self::redis();
 
         $start = time();
@@ -152,7 +151,7 @@ class Collector
             $next_list_url = sprintf($next_url, $i);
 
             echo "   Start Scanning Next List Pages ({$i}): {$next_list_url}", PHP_EOL;
-            self::ql();
+            $ql = self::ql();
             $html = $ql->get($next_list_url)->getHtml();
             if (Util::is_gb_html($html)) {
                 $html = Util::html_gb2utf8($html);
@@ -209,6 +208,7 @@ class Collector
         else {
             if (!empty($article) && isset($article['content'])) {
                 $articles[] = $article;
+                //print_r($articles);
                 self::article_save($articles);
                 self::add_url_hash($articles);
                 self::download_images();
@@ -296,10 +296,8 @@ class Collector
         foreach ($articles as $key => $article) {
             $source_url_md5 = $article['source_url_md5'];
             $a = $mysql->select('article', ['id', 'source_url_md5'], ['source_url_md5'=>$source_url_md5]);
+            //print_r($a);
             if (!empty($a)) {
-                $t = time();
-                $article['updated_at'] = $t;
-                $article['recollect_time'] = date('Y-m-d H:i:s', $t);
                 $mysql->update('article', $article, ['id'=>$a[0]['id']]);
             }
             else {
@@ -317,7 +315,7 @@ class Collector
     private static function download_images()
     {
         echo "Download images....", PHP_EOL;
-        $ql = QueryList::getInstance();
+        $ql = self::ql();
         $ql->use(CurlMulti::class);
         if (!empty(self::$image_urls['img_src'])) {
             $ql->curlMulti(self::$image_urls['img_src'])->success(function (QueryList $ql, CurlMulti $curl, $r) {

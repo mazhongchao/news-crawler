@@ -6,12 +6,13 @@ $usage =<<<STR
     OR:
     php main.php -tTASK [-nSITE_NAME [-f [-lLIST_URL [-sSINGLE_PAGE [-d]]]]]
     -t: required, task name.
-    -n: optional, name of web site, defined in task setting file(config/task.php).
-    -f: optional, collect only first list page.
-    -l: optional, collect a specific list page.
-    -s: optional, collect a specific single page.
+    -n: optional, web site name. This option will determine the name of file that contains the collection rules.
+        For example, the option value 'yjb_cn' maps to 'rules/yjb_cn.php'.
+    -f: optional, collect the first list page only.
+    -l: optional, collect the specific list page.
+    -s: optional, collect the specific single page.
     -d: optional, dump the data into a file which is in 'pagetext' directory, this option is valid only for option -s.
-        By default, to store the data into the database, you need to have a database configuration items in 'config' directory.
+        By default, to store the data into the database, you need to have database configuration items in 'config' directory.
 
 
 STR;
@@ -30,23 +31,24 @@ $config = require dirname(__FILE__).'/config/config.php';
 $task_name = $options['t'];
 if (isset($task[$task_name])) {
     $sites = $task[$task_name];
-    if (isset($options['n']) && isset($sites[$options['n']])) {
-        $rule_file = dirname(__FILE__).'/'.$sites[$options['n']];
-        echo $rule_file, PHP_EOL;
+    if (isset($options['n'])) {
+        $rule_name = $options['n'];
+        $rule_file = dirname(__FILE__).'/rules/'.$rule_name.'.php';
+        //echo $rule_file, PHP_EOL; exit();
         if (is_file($rule_file)) {
             $rule = require $rule_file;
             $article_url = '';
             $dump_file = false;
-            //only first list page
+            //first list page only
             if (array_key_exists('f', $options)) {
                 $rule['list_next_max'] = 0;
             }
-            //only specific list page
+            //specific list page
             else if (isset($options['l'])) {
                 $rule['list_url'] = $options['l'];
                 $rule['list_next_max'] = 0;
             }
-            //only specific detail page
+            //specific content page
             else if (isset($options['s'])) {
                 $article_url = $options['s'];
                 if (isset($options['d'])) {
@@ -76,5 +78,5 @@ if (isset($task[$task_name])) {
     }
 }
 else {
-    echo PHP_EOL, "TASK IS NOT EXISTS....", PHP_EOL;
+    echo PHP_EOL, "TASK <$task_name> IS NOT EXISTS....", PHP_EOL;
 }
