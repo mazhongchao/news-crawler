@@ -34,9 +34,10 @@ $rule = [
     'list_next_from' => 1,
     'list_next_max' => 3,
     'list_rules' => [
-        'detail_link' => ['.yxj_list li>a', 'href']
+        'article_link' => ['.yxj_list li>a', 'href'],
+        'article_title' => ['.yxj_list li>a', 'text'],
     ],
-    'detail_rules' => [
+    'article_rules' => [
         'title' => ['h1', 'text'],
         'author' => ['h2>span:eq(1)', 'text', '', function($content){
             $p = mb_strpos($content, '：');
@@ -71,6 +72,7 @@ $rule = [
 
 return $rule;
 ```
+If the data of item in `article_rules` needs to be saved to database, the name of item must match the filed name in the table `article`. Refering to `create.sql`.
 
 ## config/config.php demo
 `config/config.php` is used to configure the items required by the collection(crawler) program.
@@ -114,7 +116,7 @@ return $task;
 `<TASK_NAME_1>`, `<SITE_A>` and so on, of the above, need to be replaced with your actual value.
 
 ## Create a database
-To Refer to `create.sql` file to create a database and tables.
+Refer to `create.sql` file to create a database and tables.
 
 ## Some usage
 ```bash
