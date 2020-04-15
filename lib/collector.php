@@ -120,7 +120,7 @@ class Collector
 
         //列表第一页的所有内容页
         foreach ($link_arr as $key => $link_data) {
-            $article_url = $link_data['detail_link'];
+            $article_url = $link_data['article_link'];
             echo "   >>> start collecting content page ({$key}): {$article_url}", PHP_EOL;
             if ($article_url!='') {
                 if (!self::article_collected($article_url)) {
@@ -159,7 +159,7 @@ class Collector
             }
             $link_arr = $ql->rules($rule['list_rules'])->queryData();
             foreach ($link_arr as $key => $link_data) {
-                $article_url = $link_data['detail_link'];
+                $article_url = $link_data['article_link'];
                 echo "   >>> start collecting content page ({$i} - {$key}): $article_url", PHP_EOL;
                 if ($article_url!='') {
                     if (!self::article_collected($$article_url)) {
@@ -236,8 +236,8 @@ class Collector
             $html = Util::html_gb2utf8($html);
             $ql->html($html);
         }
-        //$rt = $ql->rules($rule['detail_rules'])->absoluteUrl($article_url)->queryData();
-        $rt = $ql->rules($rule['detail_rules'])->queryData();
+        //$rt = $ql->rules($rule['article_rules'])->absoluteUrl($article_url)->queryData();
+        $rt = $ql->rules($rule['article_rules'])->queryData();
         $rt[0]['site'] = $rule['site_name'];
         $rt[0]['source_url'] = $article_url;
         $rt[0]['source_url_md5'] = md5($article_url);
