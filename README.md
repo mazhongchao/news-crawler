@@ -20,7 +20,7 @@ and run:
 composer dump-autoload
 ```
 
-Then, to create  `rules` directory, adding rule files, to create  `config` directory, and adding `task.php` & `config.php`. Some demos are below.
+Then, to create  `rules` directory and adding rule files. To create `config` directory and adding `task.php` & `config.php`. Some demos are below.
 
 ## rules/yjb_cn.php demo
 
@@ -103,25 +103,26 @@ return $config;
 $task = [
     '<TASK_NAME_1>' => [
         'yjb_cn',  //to find collectiong rule in this file: rules/yjb_cn.php
-        '<SITE_A>'
+        '<SITE_NAME_A>'
     ],
     '<TASK_NAME_2>' => [
-        '<SITE_B>',
-        '<SITE_C>'
+        '<SITE_NAME_B>',
+        '<SITE_NAME_C>'
     ]
 ];
 
 return $task;
 ```
-`<TASK_NAME_1>`, `<SITE_A>` and so on, of the above, need to be replaced with your actual value.
+`<TASK_NAME_1>`, `<SITE_NAME_A>` and so on, of the above, need to be replaced with your actual value.
 
 ## Create a database
 Refer to `create.sql` file to create a database and tables.
 
 ## Some usage
+`<TASK_NAME>`, `<SITE_NAME>`, `<ARTICLE_URL>` need to be replaced with your actual value.
 ```bash
-php main.php -t=3h
-php main.php -t=3h -n=yjb_cn
-php main.php -t=3h -n=yjb_cn -f
-php main.php -t=3h -n=yjb_cn -s=http://www.jyb.cn/rmtzcg/xwy/wzxw/202003/t20200317_307896.html
+php main.php -t=<TASTK_NAME>
+php main.php -t=<TASTK_NAME> -n=<SITE_NAME>
+php main.php -t=<TASTK_NAME> -n=<SITE_NAME> -f
+php main.php -t=<TASTK_NAME> -n=<SITE_NAME> -s=<ARTICLE_URL>
 ```
