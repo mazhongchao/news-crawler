@@ -392,7 +392,7 @@ class Collector
             ]);
         }
         else {
-            echo "No images needed to download....", PHP_EOL;
+            echo "No image needed to download....", PHP_EOL;
         }
         //self::$image_urls = ['img_src'=>[], 'img_loc'=>[]];
         //print_r(self::$image_urls);
