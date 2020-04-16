@@ -13,7 +13,24 @@ class Collector
     protected static $mysql;
     protected static $image_urls = ['img_src'=>[], 'img_loc'=>[]];
     protected static $media_info = [];
+
+    //No actual use at present
     protected static $media_list = [];
+    protected static $media_type = [
+        'png'=>'img',
+        'jpg'=>'img',
+        'jpeg'=>'img',
+        'gif'=>'img',
+        'mp3'=>'audio',
+        'wav'=>'audio',
+        'mp4'=>'video',
+        'webm'=>'video',
+        'ogg'=>'video', //only as video (although it may also be audio)
+        'doc'=>'doc',
+        'docx'=>'doc',
+        'xls'=>'doc',
+        'xlsx'=>'doc',
+        'pdf'=>'doc'];
 
     public function __construct($config)
     {
@@ -427,9 +444,10 @@ class Collector
 
         $media_data = [
             'media_type' => substr($v_dir, 0, strlen($v_dir)-1),
-            'media_src' => $av_src,
+            'media_src' => $src,
             'media_key' => $loc_key,
-            'media_loc' => join('/', [$loc_dir, $loc_name])
+            'media_loc' => join('/', [$loc_dir, $loc_name]),
+            'created_at' => time();
         ];
         self::$media_info[] = $media_data;
 
@@ -468,13 +486,33 @@ class Collector
     }
     public static function media_list($media_url)
     {
-        self::$media_list[] = $media_url;
+        if (self::is_media($media_url)){
+            self::$media_list[] = $media_url;
+        }
         return self::$media_list;
         //return json_encode(self::$media_list);
+    }
+    //Just judge by file extension
+    private static function is_media($media_url)
+    {
+        $ext = strtolower(pathinfo($media_url, PATHINFO_EXTENSION));
+        if (in_array($ext, self::$media_type)) {
+            return true;
+        }
+        return false;
+    }
+    public static function media_type($media_url)
+    {
+        $ext = strtolower(pathinfo($media_url, PATHINFO_EXTENSION));
+        if (array_key_exists($ext, self::$media_type)) {
+            return self::$media_type[$ext];
+        }
+        return null;
     }
     //图片、音频、视频、文档信息保存到数据库
     private static function save_media_info()
     {
+        //print_r(self::$media_info);
         if (!empty(self::$media_info)) {
             $mysql = self::mysql();
             $mysql->insert('media', self::$media_info);
