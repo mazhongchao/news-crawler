@@ -102,7 +102,7 @@ return $config;
 ```php
 $task = [
     '<TASK_NAME_1>' => [
-        'yjb_cn',  //to find collectiong rule in this file: rules/yjb_cn.php
+        'yjb_cn',  //to find rule in this file: rules/yjb_cn.php
         '<SITE_NAME_A>'
     ],
     '<TASK_NAME_2>' => [
