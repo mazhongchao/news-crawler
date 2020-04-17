@@ -1,8 +1,7 @@
 <?php
+use Medoo\Medoo;
 use QL\QueryList;
 use QL\Ext\CurlMulti;
-use QL\Ext\AbsoluteUrl;
-use Medoo\Medoo;
 
 class Collector
 {
@@ -11,6 +10,7 @@ class Collector
     protected static $config;
     protected static $redis;
     protected static $mysql;
+    protected static $current_url;
     protected static $image_urls = ['img_src'=>[], 'img_loc'=>[]];
     protected static $media_info = [];
     protected static $media_type = [
@@ -198,6 +198,7 @@ class Collector
     }
     private static function get_single_page($rule, $article_url, $dump_file=false)
     {
+        self::$current_url = $article_url;
         $article = [];
         if (!self::article_collected($article_url)) {
             $article = self::article_parse($article_url, [], $rule);
@@ -244,6 +245,7 @@ class Collector
 
     private static function article_parse($article_url, $list_data, $rule)
     {
+        self::$current_url = $article_url;
         $ql = self::ql();
         $html = $ql->get($article_url)->getHtml();
         if (Util::is_gb_html($html)) {
@@ -397,6 +399,10 @@ class Collector
 
     public static function imgurl_parse($img_src)
     {
+        $img_src = Util::absolute_url($img_src, self::$current_url);
+        if (!$img_src) {
+            return '';
+        }
         $image_base_dir = '';
         if (isset(self::$config['image_base_dir'])) {
             $image_base_dir = self::$config['image_base_dir'];
@@ -407,6 +413,7 @@ class Collector
 
         $loc_key = $name_arr[0];
         $loc_name = $name_arr[1];
+
         self::$image_urls['img_src'][] = $img_src;
         self::$image_urls['img_loc'][$loc_key] = join('/', [$loc_dir, $loc_name]);
 
@@ -417,6 +424,10 @@ class Collector
     }
     public static function mediaurl_parse($src, $type='video')
     {
+        $src = Util::absolute_url($src, self::$current_url);
+        if (!$src) {
+            return '';
+        }
         $base_dir = '';
         $v_dir = '';
         if ($type == 'video') {
