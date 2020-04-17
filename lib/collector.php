@@ -304,6 +304,9 @@ class Collector
         if (isset($list_data['reprinted']) && !isset($rt[0]['reprinted'])){
             $rt[0]['reprinted'] = $list_data['reprinted'];
         }
+        if (isset($rt[0]['media_list']) && !empty($rt[0]['media_list'])) {
+            $rt[0]['media_list'] = json_encode($rt[0]['media_list']);
+        }
         //print_r($rt[0]);
         return $rt[0];
     }
