@@ -2,7 +2,7 @@
 
 class Util
 {
-    public static function absolute_url($url, $refer_url)
+    public static function absolute_url($url_path, $refer_url)
     {
         if (filter_var($refer_url, FILTER_VALIDATE_URL) == false){
             return false;
