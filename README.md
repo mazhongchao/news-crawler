@@ -1,7 +1,7 @@
 ## PHP Dependency
 * composer require jaeger/querylist 4.1.0
 * composer require jaeger/querylist-curl-multi
-* composer require jaeger/querylist-absolute-url
+* ~~composer require jaeger/querylist-absolute-url~~
 * composer require catfan/medoo
 
 ## Middleware
@@ -119,7 +119,8 @@ return $task;
 Refer to `create.sql` file to create a database and tables.
 
 ## Some usage
-`<TASK_NAME>`, `<SITE_NAME>`, `<ARTICLE_URL>` need to be replaced with your actual value.
+The following  `<TASK_NAME>`, `<SITE_NAME>`, `<ARTICLE_URL>`  need to be replaced with your actual value.
+
 ```bash
 php main.php -t=<TASTK_NAME>
 php main.php -t=<TASTK_NAME> -n=<SITE_NAME>
