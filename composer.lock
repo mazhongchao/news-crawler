@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f7602cca97d5ca12e23a0b3c1977f5e0",
+    "content-hash": "b1e78e9ed3751627279e9583aa754510",
     "packages": [
         {
             "name": "ares333/php-curl",
@@ -419,46 +419,6 @@
             "time": "2018-12-12T07:29:31+00:00"
         },
         {
-            "name": "jaeger/querylist-absolute-url",
-            "version": "4.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jae-jae/QueryList-AbsoluteUrl.git",
-                "reference": "0c7a5677ccfca959ee353cbc3b19472dc9e9739f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jae-jae/QueryList-AbsoluteUrl/zipball/0c7a5677ccfca959ee353cbc3b19472dc9e9739f",
-                "reference": "0c7a5677ccfca959ee353cbc3b19472dc9e9739f",
-                "shasum": ""
-            },
-            "require": {
-                "pguardiario/phpuri": "^1.0",
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "jaeger/querylist": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "QL\\Ext\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jaeger",
-                    "email": "JaegerCode@gmail.com"
-                }
-            ],
-            "description": "QueryList Plugin: Converting relative urls to absolute.QueryList插件:转换URL相对路径到绝对路径.",
-            "time": "2017-12-22T07:36:53+00:00"
-        },
-        {
             "name": "jaeger/querylist-curl-multi",
             "version": "4.0.1",
             "source": {
@@ -497,30 +457,6 @@
             ],
             "description": "QueryList Plugin: Curl multi threading. QueryList Curl多线程插件",
             "time": "2018-10-16T07:13:30+00:00"
-        },
-        {
-            "name": "pguardiario/phpuri",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/monkeysuffrage/phpuri.git",
-                "reference": "ad0a5ec033fe616cfef55578b9c7f2458be8fbfc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/monkeysuffrage/phpuri/zipball/ad0a5ec033fe616cfef55578b9c7f2458be8fbfc",
-                "reference": "ad0a5ec033fe616cfef55578b9c7f2458be8fbfc",
-                "shasum": ""
-            },
-            "type": "project",
-            "autoload": {
-                "files": [
-                    "phpuri.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "A php library for converting relative urls to absolute.",
-            "time": "2015-05-24T09:13:17+00:00"
         },
         {
             "name": "psr/http-message",
