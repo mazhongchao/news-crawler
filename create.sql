@@ -20,7 +20,6 @@ CREATE TABLE `article` (
   `tags` varchar(255) NOT NULL DEFAULT '' COMMENT '原文标签',
   `read_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '原文阅读数：0为未提供',
   `reprinted` varchar(10) NOT NULL DEFAULT '' COMMENT '原文是转载还是原创，空为不明确',
-  `media_list` json NOT NULL COMMENT '原文中所含media的url的列表',
   PRIMARY KEY (`id`),
   KEY `KEY1` (`title`),
   KEY `KEY2` (`pub_date`),

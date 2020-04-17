@@ -13,9 +13,6 @@ class Collector
     protected static $mysql;
     protected static $image_urls = ['img_src'=>[], 'img_loc'=>[]];
     protected static $media_info = [];
-
-    //No actual use at present
-    protected static $media_list = [];
     protected static $media_type = [
         'png'=>'img',
         'jpg'=>'img',
@@ -304,9 +301,6 @@ class Collector
         if (isset($list_data['reprinted']) && !isset($rt[0]['reprinted'])){
             $rt[0]['reprinted'] = $list_data['reprinted'];
         }
-        if (isset($rt[0]['media_list']) && !empty($rt[0]['media_list'])) {
-            $rt[0]['media_list'] = json_encode($rt[0]['media_list']);
-        }
         //print_r($rt[0]);
         return $rt[0];
     }
@@ -450,7 +444,7 @@ class Collector
             'media_src' => $src,
             'media_key' => $loc_key,
             'media_loc' => join('/', [$loc_dir, $loc_name]),
-            'created_at' => time();
+            'created_at' => time()
         ];
         self::$media_info[] = $media_data;
 
@@ -486,14 +480,6 @@ class Collector
         else {
             return [$file_key, $file_name];
         }
-    }
-    public static function media_list($media_url)
-    {
-        if (self::is_media($media_url)){
-            self::$media_list[] = $media_url;
-        }
-        return self::$media_list;
-        //return json_encode(self::$media_list);
     }
     //Just judge by file extension
     private static function is_media($media_url)
