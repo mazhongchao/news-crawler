@@ -11,6 +11,15 @@ class Util
             return $url_path;
         }
         else {
+            if (substr($url_path, 0, 2) == '//') {
+                $path_arr = explode('/', $url_path);
+                if (isset($path_arr[2])) {
+                    if (preg_match ("/^([A-Za-z0-9-]+\.)+([A-Za-z]{2,4})$/i", $path_arr[2])) {
+                        return "http:{$url_path}";
+                    }
+                }
+                $url_path = substr($url_path, 1);
+            }
             extract(parse_url($refer_url));
             $path = trim($path, "/");
             $path_arr = explode('/', $path);
@@ -39,7 +48,7 @@ class Util
                 $abs_url = "$scheme://$host$url_path";
             }
             else {
-                return false;
+                $abs_url = "$scheme://$host/$url_path";
             }
             return $abs_url;
         }

@@ -2,6 +2,7 @@
 use Medoo\Medoo;
 use QL\QueryList;
 use QL\Ext\CurlMulti;
+use GuzzleHttp\Exception\RequestException;
 
 class Collector
 {
@@ -123,7 +124,13 @@ class Collector
         $list_url = $rule['list_url'];
         $list_rule = $rule['list_rules'];
         $ql = self::ql();
-        $html = $ql->get($list_url)->getHtml();
+        try {
+            $html = $ql->get($list_url)->getHtml();
+        }
+        catch(RequestException $e){
+            echo "HTTP Error >>> ".$e->getMessage(), PHP_EOL;
+            return;
+        }
         if (Util::is_gb_html($html)) {
             $html = Util::html_gb2utf8($html);
             $ql->html($html);
@@ -166,7 +173,13 @@ class Collector
 
             echo "   Start Scanning Next List Pages ({$i}): {$next_list_url}", PHP_EOL;
             $ql = self::ql();
-            $html = $ql->get($next_list_url)->getHtml();
+            try {
+                $html = $ql->get($next_list_url)->getHtml();
+            }
+            catch(RequestException $e){
+                echo "HTTP Error >>> ".$e->getMessage(), PHP_EOL;
+                continue;
+            }
             if (Util::is_gb_html($html)) {
                 $html = Util::html_gb2utf8($html);
                 $ql->html($html);
@@ -247,7 +260,14 @@ class Collector
     {
         self::$current_url = $article_url;
         $ql = self::ql();
-        $html = $ql->get($article_url)->getHtml();
+        try {
+            $html = $ql->get($article_url)->getHtml();
+        }
+        catch(RequestException $e){
+            echo "HTTP Error >>> ".$e->getMessage(), PHP_EOL;
+            $rt[0]['content']='';
+            return $rt[0];
+        }
         if (Util::is_gb_html($html)) {
             $html = Util::html_gb2utf8($html);
             $ql->html($html);
@@ -265,15 +285,15 @@ class Collector
             //$c = str_replace(PHP_EOL, '', $c);
             //$c = str_replace(['\n', '\r\n', '\r'], '', trim($c));
 
-            //setting cover image
-            $doc=\phpQuery::newDocumentHTML($c);
-            $imgs = pq($doc)->find('img');
-            if (isset($imgs) && count($imgs)>0) {
-                $rt[0]['cover_img'] = pq($imgs[0])->attr('src');
-            }
-            else {
-                $rt[0]['cover_img'] = '';
-            }
+            //setting cover image use the first image of the article content.
+            // $doc=\phpQuery::newDocumentHTML($c);
+            // $imgs = pq($doc)->find('img');
+            // if (isset($imgs) && count($imgs)>0) {
+            //     $rt[0]['cover_img'] = pq($imgs[0])->attr('src');
+            // }
+            // else {
+            //     $rt[0]['cover_img'] = '';
+            // }
             //end of setting cover image
 
             //remove html comments
@@ -361,7 +381,7 @@ class Collector
                 unset(self::$image_urls['img_src'][$idx]);
                 unset(self::$image_urls['img_loc'][$key]);
             })->error(function ($errorInfo, CurlMulti $curl){
-                echo "image url:{$errorInfo['info']['url']}", PHP_EOL;
+                echo "download image error: {$errorInfo['info']['url']}", PHP_EOL;
                 print_r($errorInfo['error']);
                 $source_url = $errorInfo['info']['url'];
                 $key = md5($source_url);
@@ -484,6 +504,15 @@ class Collector
         if (isset($path_arr['extension'])) {
             $file_ext = $path_arr['extension'];
         }
+        // if (strlen($file_ext)>3) {
+        //     $s = substr($file_ext, 0, 4);
+        //     if ($s == 'jpeg'){
+        //         $file_ext = $s;
+        //     }
+        //     else {
+        //         $file_ext = substr($file_ext, 0, 3);
+        //     }
+        // }
         $file_key = $file_name = md5($asset_url);
         if ($file_ext!='') {
             return [$file_key, join('.', [$file_name, $file_ext])];
