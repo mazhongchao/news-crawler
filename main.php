@@ -60,7 +60,7 @@ if (isset($task[$task_name])) {
             $collector->work($rule, $article_url, $dump_file);
         }
         else {
-            echo PHP_EOL, "The Rule File <$rule_file> IS NOT EXISTS....", PHP_EOL;
+            echo "The Rule File <$rule_file> IS NOT EXISTS....", PHP_EOL, PHP_EOL;
         }
     }
     else {
@@ -78,5 +78,5 @@ if (isset($task[$task_name])) {
     }
 }
 else {
-    echo PHP_EOL, "TASK <$task_name> IS NOT EXISTS....", PHP_EOL;
+    echo "TASK <$task_name> IS NOT EXISTS....", PHP_EOL, PHP_EOL;
 }
