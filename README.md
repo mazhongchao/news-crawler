@@ -61,8 +61,13 @@ $rule = [
             if (isset($imgs) && count($imgs)>0) {
                 foreach ($imgs as $img) {
                     $local_src = Collector::imgurl_parse(pq($img)->attr('src'));
-                    pq($img)->removeAttr('*');
-                    pq($img)->attr('src', $local_src);
+                    if (!empty($local_src)) {
+                        pq($img)->removeAttr('*');
+                        pq($img)->attr('src', $local_src);
+                    }
+                    else {
+                        pq($img)->remove();
+                    }
                 }
             }
             return $doc->htmlOuter();
