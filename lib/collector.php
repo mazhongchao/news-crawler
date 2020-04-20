@@ -504,15 +504,15 @@ class Collector
         if (isset($path_arr['extension'])) {
             $file_ext = $path_arr['extension'];
         }
-        // if (strlen($file_ext)>3) {
-        //     $s = substr($file_ext, 0, 4);
-        //     if ($s == 'jpeg'){
-        //         $file_ext = $s;
-        //     }
-        //     else {
-        //         $file_ext = substr($file_ext, 0, 3);
-        //     }
-        // }
+        if (strlen($file_ext)>3) {
+            $s = substr($file_ext, 0, 4);
+            if ($s == 'jpeg'){
+                $file_ext = $s;
+            }
+            else {
+                $file_ext = substr($file_ext, 0, 3);
+            }
+        }
         $file_key = $file_name = md5($asset_url);
         if ($file_ext!='') {
             return [$file_key, join('.', [$file_name, $file_ext])];
