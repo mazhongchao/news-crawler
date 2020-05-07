@@ -302,6 +302,9 @@ class Collector
         else {
             $rt[0]['content'] = '';
         }
+        if (isset($list_data['published_date']) && !isset($rt[0]['pub_date'])){
+            $rt[0]['pub_date'] = $list_data['published_date'];
+        }
         if (isset($list_data['summary']) && !isset($rt[0]['summary'])){
             $rt[0]['summary'] = $list_data['summary'];
         }
