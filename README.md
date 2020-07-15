@@ -77,7 +77,7 @@ $rule = [
 
 return $rule;
 ```
-If the data of item in `article_rules` needs to be saved to database, the name of item must match the filed name in the table `article`. Refering to `create.sql`.
+If the data of item in `article_rules` needs to be saved to database, the name of item must match the field name in the table `article`. Refering to `create.sql`.
 
 ## config/config.php demo
 `config/config.php` is used to configure the items required by the collection(crawler) program.
