@@ -9,7 +9,7 @@
 * Redis
 
 ## Add the Collector
-Editing composer.json:
+Edit composer.json:
 ```javascript
 "autoload": {
     "classmap": ["lib/"]
