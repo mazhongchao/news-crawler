@@ -20,7 +20,7 @@ and run:
 composer dump-autoload
 ```
 
-Then, to create  `rules` directory and adding rule files. To create `config` directory and adding `task.php` & `config.php`. Some demos are below.
+Then create `rules` directory and add rule files, create `config` directory and add `task.php` & `config.php`. Some demos are below.
 
 ## rules/yjb_cn.php demo
 
@@ -77,7 +77,7 @@ $rule = [
 
 return $rule;
 ```
-If the data of item in `article_rules` needs to be saved to database, the name of item must match the field name in the table `article`. Refering to `create.sql`.
+If the data of item in `article_rules` needs to be saved to database, the name of item must match field name of the table `article`. Refering to `create.sql`.
 
 ## config/config.php demo
 `config/config.php` is used to configure the items required by the collection(crawler) program.
