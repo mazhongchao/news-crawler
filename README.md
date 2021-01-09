@@ -24,7 +24,7 @@ Then create `rules` directory and add some rule files, create `config` directory
 
 ## rules/yjb_cn.php demo
 
-`rules/yjb_cn.php` is used to define collection(crawler) rule. For example:
+`rules/yjb_cn.php` is used to define collection rule. For example:
 
 ```php
 $rule = [
@@ -77,7 +77,7 @@ $rule = [
 
 return $rule;
 ```
-If the data in key `article_rules` of `$rule` needs to be saved to database, the names of sub-keys in `article_rules` must match field names of the table `article`. Refering to `create.sql`.
+If the data in key `'article_rules'` of `$rule` needs to be saved to database, the names of sub-keys in `'article_rules'` must match field names of the table `article`. Refering to `create.sql`.
 
 ## config/config.php demo
 `config/config.php` is used to configure the items required by the crawler program.
